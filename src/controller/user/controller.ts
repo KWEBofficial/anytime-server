@@ -3,7 +3,7 @@ import UserService from '../../service/user.service';
 import CreateUserInput from '../../type/user/create.input';
 import { BadRequestError } from '../../util/customErrors';
 
-// 예시 controller입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다.
+// 예시 controller입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다. json으로 백과 프론트가 소통
 
 export const getUserById: RequestHandler = async (req, res, next) => {
   try {

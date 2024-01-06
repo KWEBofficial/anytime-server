@@ -7,7 +7,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-// 예시 entity입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다.
+// 예시 entity입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다. typeORM
 
 @Entity()
 export default class User {
@@ -38,3 +38,6 @@ export default class User {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
 }
+//camel -> under bar
+//entity folder 테이블 개수만큼 만들어야 함.
+//repository folder 개수만큼 만들어져야 함. 담당이 있는 것
