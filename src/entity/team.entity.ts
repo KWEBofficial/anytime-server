@@ -37,7 +37,7 @@ export default class Team {
     nullable: false,
     default: 0,
   })
-  isPublic!: number;
+  isPublic!: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;
