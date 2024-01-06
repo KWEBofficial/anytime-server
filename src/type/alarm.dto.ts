@@ -1,4 +1,4 @@
-export default interface AlarmResDTO {
+export interface AlarmResDTO {
   alarmId: number;
   teamId: number;
   scheduleId: number;

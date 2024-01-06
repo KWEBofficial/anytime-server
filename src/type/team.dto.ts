@@ -1,14 +1,14 @@
 import { NoticeResDTO } from './notice.dto';
 import { ScheduleDTO } from './schedule.dto';
 
-export default interface TeamCreateReqDTO {
+export interface TeamCreateReqDTO {
   teamname: string;
   color: number;
   explanation: string;
   isPublic: boolean;
 }
 
-export default interface MyTeamResDTO {
+export interface MyTeamResDTO {
   teamId: number;
   teamname: string;
   isAdmin: boolean;
@@ -17,14 +17,14 @@ export default interface MyTeamResDTO {
   isHide: boolean;
 }
 
-export default interface TeamListResDTO {
+export interface TeamListResDTO {
   teamId: number;
   teamname: string;
   color: number;
   explanation: string;
 }
 
-export default interface TeamUpdateReqDTO {
+export interface TeamUpdateReqDTO {
   teamname: string;
   color: number;
   explanation: string;
@@ -36,7 +36,7 @@ export interface TeamMemberDTO {
   isAdmin: boolean;
 }
 
-export default interface TeamReadResDTO {
+export interface TeamReadResDTO {
   teamname: string;
   color: number;
   explanation: string;
