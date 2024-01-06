@@ -74,6 +74,6 @@ export const registerMember: RequestHandler = async (req, res, next) => {
 };
 
 export const test: RequestHandler = (req, res) => {
-  console.log(req.session);
+  console.log(req.user);
   return res.status(200).json();
 };

@@ -8,6 +8,7 @@ import errorHandler from './util/errorHandler';
 import session from 'express-session';
 import passport from 'passport';
 import { passportConfig } from './passport';
+
 const PORT = Number(process.env.PORT) || 3000;
 
 const app = express();
@@ -22,10 +23,10 @@ passportConfig();
 
 app.use(
   session({
-    name: 'mysession', // 쿠키에 저장될 세션키 이름
-    secret: process.env.SESSION_SECRET as string, // 세션 암호화를 위한 시크릿
-    resave: true, // 옵션 참고
-    //saveUninitialize: true, // 옵션 참고
+    name: 'mysession',
+    secret: process.env.SESSION_SECRET as string,
+    resave: true,
+    //saveUninitialize: true,
   }),
 );
 
