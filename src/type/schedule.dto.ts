@@ -1,10 +1,3 @@
-export interface ScheAddDTO {
-  name: string;
-  startTime: Date;
-  endTime: Date;
-  explanation: string;
-}
-
 export interface ScheduleDTO {
   name: string;
   startDate: Date;
@@ -12,30 +5,23 @@ export interface ScheduleDTO {
   explanation: string;
 }
 
-export interface TeamScheduleDTO {
+export interface TeamScheResDTO {
   teamId: number;
   teamname: string;
   schedules: ScheduleDTO[];
 }
 
-export interface AllScheSearchDTO {
+export interface AllScheSearchResDTO {
   MySchedules: ScheduleDTO[];
-  TeamSchedules: TeamScheduleDTO[];
+  TeamSchedules: TeamScheResDTO[];
 }
 
-export interface ScheEditDTO {
-  name: string;
-  startTime: Date;
-  endTime: Date;
-  explanation: string;
-}
-
-export default interface ScheDTO {
+export interface ScheResDTO {
   startDate: Date;
   endDate: Date;
 }
 
-export default interface TeamMemScheDTO {
+export interface TeamMemScheDTO {
   memberId: number;
-  schedules: ScheDTO[];
+  schedules: ScheResDTO[];
 }

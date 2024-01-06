@@ -1,3 +1,6 @@
+import { NoticeResDTO } from './notice.dto';
+import { ScheduleDTO } from './schedule.dto';
+
 export default interface TeamCreateReqDTO {
   teamname: string;
   color: number;
@@ -39,7 +42,7 @@ export default interface TeamReadResDTO {
   explanation: string;
   isPublic: boolean;
   members: TeamMemberDTO[];
-  //schedules : ScheduleDTO[];
-  //notices : NoticeResDTO[];
+  schedules: ScheduleDTO[];
+  notices: NoticeResDTO[];
   isAdmin: boolean;
 }
