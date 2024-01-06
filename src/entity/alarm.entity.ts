@@ -6,42 +6,25 @@ import {
   UpdateDateColumn,
   PrimaryGeneratedColumn,
   OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import member from './member.entity';
 import team from './team.entity';
 import schedule from './schedule.entity';
 
 @Entity()
-export default class alarm {
+export default class Alarm {
   @PrimaryGeneratedColumn()
   id!: number;
-  /*
-    @Column({
-        type: 'int',
-        nullable: false
-    })
-    memberId!: number;
-*/
+
   @OneToOne(() => member)
   @JoinColumn()
   member!: member;
-  /*
-    @Column({
-        type: 'int',
-        nullable: false
-    })
-    teamId!: number;
-*/
+
   @OneToOne(() => team)
   @JoinColumn()
   team!: team;
-  /*
-    @Column({
-        type: 'int',
-        nullable: false
-    })
-    schedule!: number;
-*/
+
   @OneToOne(() => schedule)
   @JoinColumn()
   schedule!: schedule;

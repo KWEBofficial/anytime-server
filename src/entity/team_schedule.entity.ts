@@ -1,33 +1,17 @@
-import {
-  Entity,
-  Column,
-  PrimaryGeneratedColumn,
-  ManyToOne,
-  OneToOne,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
 import team from './team.entity';
 import schedule from './schedule.entity';
 
 @Entity()
-export default class team_schedule {
+export default class TeamSchedule {
   @PrimaryGeneratedColumn()
   id!: number;
-  /*
-    @Column({
-        type: 'int',
-        nullable: false
-    })
-    teamId!: number;
-*/
-  @ManyToOne(() => team, (team: team) => team.schedules)
+
+  @OneToOne(() => team)
+  @JoinColumn()
   team!: team;
-  /*
-    @Column({
-        type: 'int',
-        nullable: false
-    })
-    scheduleId!: number;
-*/
-  @OneToOne(() => schedule, (schedule: schedule) => schedule.teams)
+
+  @OneToOne(() => schedule)
+  @JoinColumn()
   schedule!: schedule;
 }

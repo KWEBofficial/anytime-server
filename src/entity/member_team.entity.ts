@@ -5,7 +5,6 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
-  ManyToOne,
   OneToOne,
   JoinColumn,
 } from 'typeorm';
@@ -13,7 +12,7 @@ import member from './member.entity';
 import team from './team.entity';
 
 @Entity()
-export default class member_team {
+export default class MemberTeam {
   @PrimaryGeneratedColumn()
   id!: number;
 
@@ -21,7 +20,8 @@ export default class member_team {
   @JoinColumn()
   member!: member;
 
-  @ManyToOne(() => team, (team: team) => team.members)
+  @OneToOne(() => team)
+  @JoinColumn()
   team!: team;
 
   @Column({

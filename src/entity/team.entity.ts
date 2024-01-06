@@ -1,67 +1,50 @@
 import {
-    Entity,
-    Column,
-    CreateDateColumn,
-    DeleteDateColumn,
-    UpdateDateColumn,
-    PrimaryGeneratedColumn,
-    OneToMany,
+  Entity,
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  UpdateDateColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
-import member_team from './member_team.entity';
-import team_schedule from './team_schedule.entity';
-import notice from './notice.entity';
-import alarm from './alarm.entity';
-  @Entity()
-  export default class team {
-    @PrimaryGeneratedColumn()
-    id!: number;
 
-    @Column({
-        type: 'varchar',
-        length: 16,
-        nullable: false
-    })
-    teamname!: string;
+@Entity()
+export default class Team {
+  @PrimaryGeneratedColumn()
+  id!: number;
 
-    @Column({
-        type: 'int',
-        nullable: false
-    })
-    color!: number;
+  @Column({
+    type: 'varchar',
+    length: 16,
+    nullable: false,
+  })
+  teamname!: string;
 
-    @Column({
-        type: 'varchar',
-        length: 256,
-        nullable: false
-    })
-    explanation!: string;
+  @Column({
+    type: 'int',
+    nullable: false,
+  })
+  color!: number;
 
-    @Column({
-        type: 'tinyint',
-        nullable: false,
-        default: 0
-    })
-    isPublic!: number;
-    
-    @CreateDateColumn({ type: 'timestamp' })
-    createdAt!: Date;
-  
-    @UpdateDateColumn({ type: 'timestamp', nullable: true })
-    updatedAt?: Date;
-  
-    @DeleteDateColumn({ type: 'timestamp', nullable: true })
-    deletedAt?: Date;
-/*
-    @OneToMany(() => member_team, (member_team:member_team) => member_team.team)
-    members!: member_team[];
+  @Column({
+    type: 'varchar',
+    length: 256,
+    nullable: false,
+  })
+  explanation!: string;
 
-    @OneToMany(() => team_schedule, (team_schedule:team_schedule) => team_schedule.team)
-    schedules!: team_schedule[];
+  @Column({
+    type: 'tinyint',
+    nullable: false,
+    default: 0,
+  })
+  isPublic!: number;
 
-    @OneToMany(() => notice, (notice:notice) => notice.team)
-    notices!: notice[];
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt!: Date;
 
-    @OneToMany(() => alarm, (alarm:alarm) => alarm.team)
-    alarms!: alarm[];
-*/
+  @UpdateDateColumn({ type: 'timestamp', nullable: true })
+  updatedAt?: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt?: Date;
 }

@@ -3,7 +3,7 @@ import member from './member.entity';
 import schedule from './schedule.entity';
 
 @Entity()
-export default class member_schedule {
+export default class MemberSchedule {
   @PrimaryGeneratedColumn()
   id!: number;
 
