@@ -12,7 +12,7 @@ export const getUserById: RequestHandler = async (req, res, next) => {
     const user = await UserService.getUserById(id);
     if (!user) throw new BadRequestError('해당하는 유저가 없습니다.');
 
-    res.json(user);
+    res.json(user); 
   } catch (error) {
     next(error);
   }
