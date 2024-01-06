@@ -22,7 +22,7 @@ export const passportConfig = () => {
     new LocalStrategy.Strategy(
       {
         // local 전략을 세움
-        usernameField: 'membername',
+        usernameField: 'email',
         passwordField: 'password',
         session: true, // 세션에 저장 여부
         passReqToCallback: false,

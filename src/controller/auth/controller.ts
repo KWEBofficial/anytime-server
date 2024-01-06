@@ -20,32 +20,33 @@ export const isNotLoggedIn: RequestHandler = (req, res, next) => {
     res.status(401).send('이미 로그인 됨');
   }
 };
-
-export const loginMember: RequestHandler = async (req, res, next) => {
-  const callbackFunc: passport.AuthenticateCallback = (
-    authError,
-    user,
-    info,
-  ) => {
-    if (authError) {
-      console.error(authError);
-      res.status(500);
-      return next(authError);
-    }
-    if (!user) {
-      res.status(500);
-      return res.send(info);
-    }
-    return req.login(user, (loginError) => {
-      if (loginError) {
-        console.error(loginError);
-        res.status(500);
-        return next(loginError);
+export const loginMember: RequestHandler = async (req, res) => {
+  await passport.authenticate(
+    'local',
+    (err: string, user: Express.User, options: { message: string }) => {
+      if (user) {
+        // If the user exists log him in:
+        req.login(user, (error) => {
+          if (error) {
+            console.log(options.message);
+            return res.status(400).json();
+          } else {
+            console.log('Successfully authenticated');
+            // HANDLE SUCCESSFUL LOGIN
+            // e.g. res.redirect("/home")
+            return res.status(200).json();
+          }
+        });
+      } else {
+        console.log(options.message);
+        return res.status(400).json();
+        // HANDLE FAILURE LOGGING IN
+        // e.g. res.redirect("/login"))
+        // or
+        // res.render("/login", { message: options.message || "custom message" })
       }
-      return res.send(user);
-    });
-  };
-  passport.authenticate('local', callbackFunc)(req, res, next);
+    },
+  )(req, res);
 };
 
 export const registerMember: RequestHandler = async (req, res, next) => {
@@ -70,4 +71,9 @@ export const registerMember: RequestHandler = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
+};
+
+export const test: RequestHandler = (req, res) => {
+  console.log(req.session);
+  return res.status(200).json();
 };

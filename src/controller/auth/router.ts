@@ -1,19 +1,11 @@
 import { Router } from 'express';
-import passport from 'passport';
-import { registerMember } from './controller';
+import { isLoggedIn, loginMember, registerMember, test } from './controller';
 
 const authRouter = Router();
 
 authRouter.post('/register', registerMember);
-authRouter.post(
-  '/login',
-  passport.authenticate('local', {
-    failureRedirect: '/',
-  }),
-  (req, res) => {
-    res.redirect('/');
-  },
-);
+authRouter.post('/login', loginMember);
+authRouter.get('/test', isLoggedIn, test);
 //authRouter.post('/logout', logoutMember);
 
 export default authRouter;
