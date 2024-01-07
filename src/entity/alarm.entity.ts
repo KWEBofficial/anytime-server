@@ -41,7 +41,7 @@ export default class Alarm {
     nullable: false,
     default: 0,
   })
-  isRead!: number;
+  isRead!: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;
