@@ -5,19 +5,17 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
-import team from './team.entity';
+import Team from './team.entity';
 
 @Entity()
 export default class Notice {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToOne(() => team)
-  @JoinColumn()
-  team!: team;
+  @ManyToOne(() => Team, (team) => team.notices)
+  team!: Team;
 
   @Column({
     type: 'varchar',
@@ -28,15 +26,15 @@ export default class Notice {
 
   @Column({
     type: 'timestamp',
-    nullable: false,
+    nullable: true,
   })
-  startTime!: Date;
+  startDate?: Date;
 
   @Column({
     type: 'timestamp',
-    nullable: false,
+    nullable: true,
   })
-  endTime!: Date;
+  endDate?: Date;
 
   @Column({
     type: 'tinyint',
