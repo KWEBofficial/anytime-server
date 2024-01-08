@@ -1,24 +1,11 @@
 import { RequestHandler } from 'express';
 import AlarmService from '../../service/alarm.service';
 import { BadRequestError } from '../../util/customErrors';
-import AlarmRepository from '../../repository/alarm.repository';
 
 export const getAlarm: RequestHandler = async (req, res, next) => {
   try {
     const memberId = Number(req.user);
-
-    const alarms = await AlarmRepository.createQueryBuilder('alarm')
-      .innerJoin('alarm.team', 'team.id')
-      .innerJoin('alarm.schedule', 'schedule.id')
-      .select([
-        'alarm.id',
-        'team.id.id',
-        'schedule.id.id',
-        'alarm.content',
-        'alarm.isRead',
-      ])
-      .where('alarm.member = :memberId', { memberId })
-      .getMany();
+    const alarms = await AlarmService.getAlarm(memberId);
 
     res.status(200).json(alarms);
   } catch (error) {
