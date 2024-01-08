@@ -5,11 +5,12 @@ import {
   updateNotice,
   deleteNotice,
 } from './controller';
-const noticeRouter = Router();
+import { isLoggedIn } from '../auth/controller';
 
-noticeRouter.get('/:teamId', getNotices);
-noticeRouter.post('/create/:teamId', createNotice);
-noticeRouter.patch('/:noticeId', updateNotice);
-noticeRouter.delete('/:noticeId', deleteNotice);
+const noticeRouter = Router();
+noticeRouter.get('/:teamId', isLoggedIn, getNotices);
+noticeRouter.post('/create/:teamId', isLoggedIn, createNotice);
+noticeRouter.patch('/:noticeId', isLoggedIn, updateNotice);
+noticeRouter.delete('/:noticeId', isLoggedIn, deleteNotice);
 
 export default noticeRouter;

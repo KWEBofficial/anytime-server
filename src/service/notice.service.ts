@@ -2,16 +2,12 @@ import { DeleteResult } from 'typeorm';
 import Notice from '../entity/notice.entity';
 import NoticeRepository from '../repository/notice.repository';
 import TeamRepository from '../repository/team.repository';
-import { InternalServerError } from '../util/customErrors';
+import { BadRequestError, InternalServerError } from '../util/customErrors';
+import Team from '../entity/team.entity';
 
 export default class NoticeService {
-  static async getNoticeById(teamId: number): Promise<Notice[]> {
+  static async getNoticeById(team: Team): Promise<Notice[]> {
     try {
-      const team = await TeamRepository.findOneOrFail({
-        where: { id: teamId },
-      });
-      //return await NoticeRepository.find({ where: { team } });
-
       return await NoticeRepository.find({ where: { team } });
     } catch (error) {
       throw new InternalServerError('공지사항 정보를 불러오는데 실패했습니다.');
@@ -19,16 +15,13 @@ export default class NoticeService {
   }
 
   static async createNotice(
-    teamId: number,
+    team: Team,
     content: string,
     startDate: Date,
     endDate: Date,
     isPrior: boolean,
   ): Promise<Notice> {
     try {
-      const team = await TeamRepository.findOneOrFail({
-        where: { id: teamId },
-      });
       return await NoticeRepository.save({
         team: team,
         content: content,
@@ -67,7 +60,7 @@ export default class NoticeService {
     }
   }
 
-  static async deleteNotice(id: number): Promise<DeleteResult> {
+  static async deleteNoticeById(id: number): Promise<DeleteResult> {
     try {
       return await NoticeRepository.delete({ id: id });
     } catch (error) {
