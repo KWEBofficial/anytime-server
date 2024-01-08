@@ -5,29 +5,25 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
-  OneToOne,
-  JoinColumn,
+  ManyToOne,
 } from 'typeorm';
-import member from './member.entity';
-import team from './team.entity';
-import schedule from './schedule.entity';
+import Member from './member.entity';
+import Team from './team.entity';
+import Schedule from './schedule.entity';
 
 @Entity()
 export default class Alarm {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToOne(() => member)
-  @JoinColumn()
-  member!: member;
+  @ManyToOne(() => Member, (member) => member.alarms)
+  member!: Member;
 
-  @OneToOne(() => team)
-  @JoinColumn()
-  team!: team;
+  @ManyToOne(() => Team, (team) => team.alarms)
+  team!: Team;
 
-  @OneToOne(() => schedule)
-  @JoinColumn()
-  schedule!: schedule;
+  @ManyToOne(() => Schedule, (schedule) => schedule.alarms)
+  schedule!: Schedule;
 
   @Column({
     type: 'varchar',
