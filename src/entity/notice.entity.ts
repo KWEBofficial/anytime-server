@@ -43,7 +43,7 @@ export default class Notice {
     nullable: false,
     default: 0,
   })
-  isPrior!: number;
+  isPrior!: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;

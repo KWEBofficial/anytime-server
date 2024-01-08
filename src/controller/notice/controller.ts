@@ -19,7 +19,7 @@ export const getNotices: RequestHandler = async (req, res, next) => {
       };
     });
 
-    res.json(noticeList);
+    res.status(200).json(noticeList);
   } catch (error) {
     next(error);
   }
@@ -28,20 +28,42 @@ export const getNotices: RequestHandler = async (req, res, next) => {
 export const createNotice: RequestHandler = async (req, res, next) => {
   try {
     const teamId = Number(req.params.teamId);
-    const { content, startDate, endDate, isPrior } =
-      req.body as NoticeUpdateReqDTO;
-    const createNoticeInput = {
-      team: teamId,
-      content: content,
-      startDate: startDate,
-      endDate: endDate,
-      isPrior: isPrior,
-    };
-    const notice = await NoticeService.createNotice(createNoticeInput);
+    const NoticeUpdateReqDTO: NoticeUpdateReqDTO = req.body;
+    const notice = await NoticeService.createNotice(
+      teamId,
+      NoticeUpdateReqDTO.content,
+      NoticeUpdateReqDTO.startDate,
+      NoticeUpdateReqDTO.endDate,
+      NoticeUpdateReqDTO.isPrior,
+    );
+    return res.status(200).json();
   } catch (error) {
     next(error);
   }
 };
 
-export const updateNotice: RequestHandler = async (req, res, next) => {};
-export const deleteNotice: RequestHandler = async (req, res, next) => {};
+export const updateNotice: RequestHandler = async (req, res, next) => {
+  try {
+    const noticeId = Number(req.params.noticeId);
+    const NoticeUpdateReqDTO: NoticeUpdateReqDTO = req.body;
+    NoticeService.updateNotice(
+      noticeId,
+      NoticeUpdateReqDTO.content,
+      NoticeUpdateReqDTO.startDate,
+      NoticeUpdateReqDTO.endDate,
+      NoticeUpdateReqDTO.isPrior,
+    );
+    return res.status(200).json();
+  } catch (error) {
+    next(error);
+  }
+};
+export const deleteNotice: RequestHandler = async (req, res, next) => {
+  try {
+    const noticeId = Number(req.params.noticeId);
+    NoticeService.deleteNotice(noticeId);
+    return res.status(200).json();
+  } catch (error) {
+    next(error);
+  }
+};
