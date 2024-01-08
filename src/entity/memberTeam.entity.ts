@@ -29,21 +29,21 @@ export default class MemberTeam {
     nullable: false,
     default: 0,
   })
-  isAdmin!: number;
+  isAdmin!: boolean;
 
   @Column({
     type: 'tinyint',
     nullable: false,
     default: 0,
   })
-  isHide!: number;
+  isHide!: boolean;
 
   @Column({
     type: 'tinyint',
     nullable: false,
     default: 0,
   })
-  isFavor!: number;
+  isFavor!: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;
