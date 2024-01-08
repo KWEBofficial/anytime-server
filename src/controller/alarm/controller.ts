@@ -1,34 +1,26 @@
 import { RequestHandler } from 'express';
 import AlarmService from '../../service/alarm.service';
-import { AlarmResDTO } from '../../type/alarm.dto';
 import { BadRequestError } from '../../util/customErrors';
-import Member from '../../entity/member.entity';
+import AlarmRepository from '../../repository/alarm.repository';
 
 export const getAlarm: RequestHandler = async (req, res, next) => {
   try {
-    const memberId = Number((req.user as Member).id);
-    console.log(`memberId: ${memberId}`);
-    console.log('session: ');
-    console.log(req.session);
-    /*
-    const alarms = (await AlarmService.getAlarm(memberId)).map((alarm) => {
-      return <AlarmResDTO>{
-        alarmId: alarm.id,
-        teamId: alarm.team.id,
-        scheduleId: alarm.schedule.id,
-        content: alarm.content,
-        isRead: alarm.isRead,
-      };
-    });
-    */
+    const memberId = Number(req.user);
 
-    const alarms = await AlarmService.getAlarm(memberId);
+    const alarms = await AlarmRepository.createQueryBuilder('alarm')
+      .innerJoin('alarm.team', 'team.id')
+      .innerJoin('alarm.schedule', 'schedule.id')
+      .select([
+        'alarm.id',
+        'team.id.id',
+        'schedule.id.id',
+        'alarm.content',
+        'alarm.isRead',
+      ])
+      .where('alarm.member = :memberId', { memberId })
+      .getMany();
 
-    if (!alarms) throw new BadRequestError('알람이 없습니다.');
-    console.log('alarms: ');
-    console.log(alarms);
-
-    res.json(alarms);
+    res.status(200).json(alarms);
   } catch (error) {
     next(error);
   }
@@ -37,13 +29,13 @@ export const getAlarm: RequestHandler = async (req, res, next) => {
 export const deleteAlarm: RequestHandler = async (req, res, next) => {
   try {
     const alarmId = Number(req.params.alarmId);
-    if (!alarmId) throw new BadRequestError('해당하는 알람이 없습니다.');
 
-    console.log(`alarmId: ${alarmId}`);
+    if (!alarmId || isNaN(alarmId))
+      throw new BadRequestError('잘못된 요청입니다.');
 
     await AlarmService.deleteAlarm(alarmId);
 
-    res.status(200);
+    res.status(200).json();
   } catch (error) {
     next(error);
   }
@@ -52,11 +44,27 @@ export const deleteAlarm: RequestHandler = async (req, res, next) => {
 export const readAlarm: RequestHandler = async (req, res, next) => {
   try {
     const alarmId = Number(req.params.alarmId);
-    console.log(`alarmId: ${alarmId}`);
-    if (!alarmId) res.status(400); // throw new BadRequestError('해당하는 알람이 없습니다.');
+
+    if (!alarmId || isNaN(alarmId))
+      throw new BadRequestError('잘못된 요청입니다.');
+
     await AlarmService.readAlarm(alarmId);
 
-    res.status(200);
+    res.status(200).json();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const restoreAlarm: RequestHandler = async (req, res, next) => {
+  try {
+    const alarmId = Number(req.params.alarmId);
+    if (!alarmId || isNaN(alarmId))
+      throw new BadRequestError('잘못된 요청입니다.');
+
+    await AlarmService.restoreAlarm(alarmId);
+
+    res.status(200).json();
   } catch (error) {
     next(error);
   }
