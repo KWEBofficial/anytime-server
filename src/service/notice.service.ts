@@ -16,6 +16,7 @@ export default class NoticeService {
       throw new InternalServerError('공지사항 정보를 불러오는데 실패했습니다.');
     }
   }
+  /*
   static async createNotice(createNoticeInput): Promise<Notice> {
     try {
     } catch (error) {
@@ -24,4 +25,5 @@ export default class NoticeService {
       );
     }
   }
+  */
 }
