@@ -3,10 +3,7 @@ import MemberTeamService from '../../service/memberTeam.servcie';
 import MemberService from '../../service/member.service';
 import { BadRequestError, ForbiddenError } from '../../util/customErrors';
 import { InviteReqDTO, AdminReqDTO } from '../../type/memberTeam.dto';
-import { memoryUsage } from 'process';
 import AlarmService from '../../service/alarm.service';
-import { InviteAlarmResDTO } from '../../type/alarm.dto';
-import { scheduler } from 'timers/promises';
 
 export const toggleFavoriteTeam: RequestHandler = async (req, res, next) => {
   try {
@@ -47,24 +44,11 @@ export const inviteMember: RequestHandler = async (req, res, next) => {
     );
     if (!invite) throw new BadRequestError('이미 초대된 유저입니다.');
 
-    const alarm = await AlarmService.createInviteAlarm(
+    await AlarmService.createInviteAlarm(
       inviteReqDTO.memberId,
       inviteReqDTO.teamId,
     );
-
-    console.log(alarm);
-    console.log(alarm.id);
-    console.log(alarm.team.id);
-    console.log(alarm.content);
-    console.log(alarm.isRead);
-    const inviteAlarmResDTO: InviteAlarmResDTO = {
-      alarmId: alarm.id,
-      teamId: alarm.team.id,
-      content: alarm?.content as unknown as string,
-      isRead: alarm.isRead,
-    };
-    console.log(inviteAlarmResDTO);
-    return res.status(200).json(inviteAlarmResDTO);
+    return res.status(200).json();
   } catch (error) {
     next(error);
   }

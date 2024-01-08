@@ -35,7 +35,7 @@ export default class MemberService {
       if (!member) return null;
       return member;
     } catch (error) {
-      throw new InternalServerError('팀 정보를 불러오는데 실패했습니다.');
+      throw new InternalServerError('유저 정보를 불러오는데 실패했습니다.');
     }
   }
 }

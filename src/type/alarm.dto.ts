@@ -5,10 +5,3 @@ export interface AlarmResDTO {
   content: string;
   isRead: boolean;
 }
-
-export interface InviteAlarmResDTO {
-  alarmId: number;
-  teamId: number;
-  content: string;
-  isRead: boolean;
-}

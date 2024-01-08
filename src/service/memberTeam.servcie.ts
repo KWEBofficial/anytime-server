@@ -1,9 +1,7 @@
-import { DeleteResult, InsertResult, IntegerType, UpdateResult } from 'typeorm';
+import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import MemberTeam from '../entity/team.entity';
 import MemberTeamRepository from '../repository/memberTeam.repository';
 import { InternalServerError } from '../util/customErrors';
-import Member from '../entity/member.entity';
-import MemberRepository from '../repository/member.repository';
 
 export default class MemberTeamService {
   static async toggleFavoriteTeam(
@@ -15,7 +13,6 @@ export default class MemberTeamService {
         where: { member: { id: memberId }, team: { id: teamId } },
       });
       const isFavor = memberTeam[0].isFavor;
-      console.log(memberTeam);
       return await MemberTeamRepository.update(memberTeam[0].id, {
         isFavor: !isFavor,
       });
@@ -33,7 +30,6 @@ export default class MemberTeamService {
         where: { member: { id: memberId }, team: { id: teamId } },
       });
       const isHide = memberTeam[0].isHide;
-      console.log(memberTeam);
       return await MemberTeamRepository.update(memberTeam[0].id, {
         isHide: !isHide,
       });
@@ -123,17 +119,4 @@ export default class MemberTeamService {
       throw new InternalServerError('팀 정보를 불러오는데 실패했습니다.');
     }
   }
-  /*
-  static async checkAdmin(memberId: number, teamId: number): Promise<boolean> {
-    try {
-      const memberTeam = await MemberTeamRepository.find({
-        where: { member: { id: memberId }, team: { id: teamId } },
-      });
-      if (memberTeam[0].isAdmin == true) return true;
-      else return false;
-    } catch (error) {
-      throw new InternalServerError('팀 정보를 불러오는데 실패했습니다.');
-    }
-  }
-  */
 }

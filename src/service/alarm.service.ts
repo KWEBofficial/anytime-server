@@ -7,21 +7,16 @@ export default class AlarmService {
   static async createInviteAlarm(
     memberId: number,
     teamId: number,
-  ): Promise<Alarm> {
+  ): Promise<InsertResult> {
     try {
       const content = `${teamId} 그룹에 초대되었습니다.`;
-      await AlarmRepository.insert({
+      return await AlarmRepository.insert({
         member: { id: memberId },
         team: { id: teamId },
-        schedule: { id: 1 },
+        schedule: { id: null } as any,
         content: content,
         isRead: false,
       });
-      return (
-        await AlarmRepository.find({
-          where: { member: { id: memberId }, team: { id: teamId } },
-        })
-      )[0];
     } catch (error) {
       throw new InternalServerError('알람 생성에 실패했습니다.');
     }
