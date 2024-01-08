@@ -1,11 +1,11 @@
-export default interface noticeResDTO {
+export interface NoticeResDTO {
   noticeId: number;
   content: string;
   createdAt: Date;
   isPrior: boolean;
 }
 
-export default interface noticeUpdateReqDTO {
+export interface NoticeUpdateReqDTO {
   content: string;
   startDate: Date;
   endDate: Date;

@@ -1,0 +1,67 @@
+import { RequestHandler } from 'express';
+import { MemberRegisterReqDTO } from '../../type/member.dto';
+import passport from 'passport';
+import bcrypt from 'bcrypt';
+import MemberService from '../../service/member.service';
+
+export const isLoggedIn: RequestHandler = (req, res, next) => {
+  if (req.isAuthenticated()) {
+    next();
+  } else {
+    res.status(401).send('needs login');
+  }
+};
+
+export const isNotLoggedIn: RequestHandler = (req, res, next) => {
+  if (!req.isAuthenticated()) {
+    next();
+  } else {
+    res.status(401).send('이미 로그인 됨');
+  }
+};
+export const loginMember: RequestHandler = async (req, res) => {
+  await passport.authenticate(
+    'local',
+    (err: string, user: Express.User, options: { message: string }) => {
+      if (user) {
+        // If the user exists log him in:
+        req.login(user, (error) => {
+          if (error) {
+            console.log(options.message);
+            return res.status(400).json();
+          } else {
+            console.log('Successfully authenticated');
+            return res.status(200).json();
+          }
+        });
+      } else {
+        console.log(options.message);
+        return res.status(400).json();
+      }
+    },
+  )(req, res);
+};
+
+export const registerMember: RequestHandler = async (req, res, next) => {
+  try {
+    const memberRegisterReqDTO: MemberRegisterReqDTO = req.body;
+    const uniqueFind = await MemberService.getMemberByEmail(
+      memberRegisterReqDTO.email,
+    );
+    if (uniqueFind) return res.status(400);
+    const hash = await bcrypt.hash(memberRegisterReqDTO.password, 1);
+    MemberService.saveMember(
+      memberRegisterReqDTO.email,
+      memberRegisterReqDTO.membername,
+      hash,
+    );
+    return res.status(200).json();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const test: RequestHandler = (req, res) => {
+  console.log(req.user);
+  return res.status(200).json();
+};

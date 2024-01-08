@@ -1,9 +1,9 @@
-export default interface InviteReqDTO {
+export interface InviteReqDTO {
   teamId: number;
   memberId: number;
 }
 
-export default interface AdminReqDTO {
+export interface AdminReqDTO {
   memberId: number;
   teamId: number;
   isAdmin: boolean;
