@@ -7,13 +7,14 @@ export default class MemberTeamService {
   static async toggleFavoriteTeam(
     memberId: number,
     teamId: number,
-  ): Promise<UpdateResult> {
+  ): Promise<UpdateResult | null> {
     try {
-      const memberTeam = await MemberTeamRepository.find({
+      const memberTeam = await MemberTeamRepository.findOne({
         where: { member: { id: memberId }, team: { id: teamId } },
       });
-      const isFavor = memberTeam[0].isFavor;
-      return await MemberTeamRepository.update(memberTeam[0].id, {
+      if (!memberTeam) return null;
+      const isFavor = memberTeam.isFavor;
+      return await MemberTeamRepository.update(memberTeam.id, {
         isFavor: !isFavor,
       });
     } catch (error) {
@@ -24,13 +25,14 @@ export default class MemberTeamService {
   static async toggleHideTeam(
     memberId: number,
     teamId: number,
-  ): Promise<UpdateResult> {
+  ): Promise<UpdateResult | null> {
     try {
-      const memberTeam = await MemberTeamRepository.find({
+      const memberTeam = await MemberTeamRepository.findOne({
         where: { member: { id: memberId }, team: { id: teamId } },
       });
-      const isHide = memberTeam[0].isHide;
-      return await MemberTeamRepository.update(memberTeam[0].id, {
+      if (!memberTeam) return null;
+      const isHide = memberTeam.isHide;
+      return await MemberTeamRepository.update(memberTeam.id, {
         isHide: !isHide,
       });
     } catch (error) {

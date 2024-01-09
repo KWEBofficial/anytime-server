@@ -11,7 +11,8 @@ export const toggleFavoriteTeam: RequestHandler = async (req, res, next) => {
     const teamId = Number(req.params.teamId);
     if (isNaN(teamId)) throw new BadRequestError('teamId가 숫자가 아닙니다.');
 
-    await MemberTeamService.toggleFavoriteTeam(memberId, teamId);
+    if (!(await MemberTeamService.toggleFavoriteTeam(memberId, teamId)))
+      throw new BadRequestError('그룹에 소속해 있지 않습니다.');
 
     return res.status(200).json();
   } catch (error) {
@@ -25,7 +26,8 @@ export const toggleHideTeam: RequestHandler = async (req, res, next) => {
     const teamId = Number(req.params.teamId);
     if (isNaN(teamId)) throw new BadRequestError('teamId가 숫자가 아닙니다.');
 
-    await MemberTeamService.toggleFavoriteTeam(memberId, teamId);
+    if (!(await MemberTeamService.toggleFavoriteTeam(memberId, teamId)))
+      throw new BadRequestError('그룹에 소속해 있지 않습니다.');
 
     return res.status(200).json();
   } catch (error) {
