@@ -6,6 +6,11 @@ import {
   TeamUpdateReqDTO,
 } from '../../type/team.dto';
 import Team from '../../entity/team.entity';
+import {
+  BadRequestError,
+  ForbiddenError,
+  UnauthorizedError,
+} from '../../util/customErrors';
 
 declare module 'express-session' {
   interface SessionData {
@@ -22,12 +27,11 @@ export const createTeam: RequestHandler = async (req, res, next) => {
     const createTeamInput = { teamname, color, explanation, isPublic };
 
     const memberId = req.session.passport?.user;
-    if (!memberId) res.status(403).json();
+    if (!memberId) throw new UnauthorizedError('로그인이 필요합니다.');
     else {
       const team = await TeamService.createTeam(createTeamInput, memberId);
       res.status(201).json(team.id);
     }
-    // memberTeam table에도 정보(team.id, memberId) 추가 (팀 구독 or 초대)
   } catch (error) {
     next(error);
   }
@@ -37,7 +41,7 @@ export const createTeam: RequestHandler = async (req, res, next) => {
 export const myTeam: RequestHandler = async (req, res, next) => {
   try {
     const memberId = req.session.passport?.user;
-    if (!memberId) res.status(403).json();
+    if (!memberId) throw new UnauthorizedError('로그인이 필요합니다.');
     else {
       const teams = (await TeamService.getTeamByMember(
         memberId,
@@ -67,6 +71,7 @@ export const searchTeam: RequestHandler = async (req, res, next) => {
 export const updateTeam: RequestHandler = async (req, res, next) => {
   try {
     const id = Number(req.params.teamId);
+    if (isNaN(id)) throw new BadRequestError('teamId가 숫자가 아닙니다.');
     const { teamname, color, explanation } = req.body as TeamUpdateReqDTO;
     const createTeamInput = { teamname, color, explanation };
 
@@ -84,7 +89,7 @@ export const showTeam: RequestHandler = async (req, res, next) => {
     const teamInfo = await TeamService.getTeamById(id);
     if (teamInfo) {
       const { teamname, color, explanation, isPublic } = teamInfo;
-    } else return res.status(404).json();
+    } else throw new BadRequestError('존재하지 않는 팀입니다.');
 
     // team id로 schedule 찾기 - ScheduleService
     // team id로 notice 찾기 - NoticeService
@@ -98,10 +103,11 @@ export const showTeam: RequestHandler = async (req, res, next) => {
 export const deleteTeam: RequestHandler = async (req, res, next) => {
   try {
     const id = Number(req.params.teamId);
+    if (isNaN(id)) throw new BadRequestError('teamId가 숫자가 아닙니다.');
     const result = await TeamService.deleteTeam(id);
 
     if (result) res.status(200).json({ message: 'delete' });
-    else res.status(400).json();
+    else throw new BadRequestError('존재하지 않는 팀입니다.');
   } catch (error) {
     next(error);
   }

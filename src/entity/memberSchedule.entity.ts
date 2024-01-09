@@ -1,17 +1,22 @@
-import { Entity, PrimaryGeneratedColumn, OneToOne, JoinColumn } from 'typeorm';
-import member from './member.entity';
-import schedule from './schedule.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
+  ManyToOne,
+} from 'typeorm';
+import Member from './member.entity';
+import Schedule from './schedule.entity';
 
 @Entity()
 export default class MemberSchedule {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @OneToOne(() => member)
-  @JoinColumn()
-  member!: member;
+  @ManyToOne(() => Member, (member) => member.schedules)
+  member!: Member;
 
-  @OneToOne(() => schedule)
+  @OneToOne(() => Schedule)
   @JoinColumn()
-  schedule!: schedule;
+  schedule!: Schedule;
 }

@@ -27,9 +27,9 @@ export default class TeamService {
       return await MemberTeamRepository.insert({
         member: { id: memberId },
         team: { id: teamId },
-        isAdmin: 1,
-        isHide: 0,
-        isFavor: 0,
+        isAdmin: true,
+        isHide: false,
+        isFavor: false,
       });
     } catch (error) {
       console.log(error);
