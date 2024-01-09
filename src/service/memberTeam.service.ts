@@ -1,18 +1,23 @@
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 import MemberTeam from '../entity/team.entity';
 import MemberTeamRepository from '../repository/memberTeam.repository';
+import TeamRepository from '../repository/team.repository';
 import { InternalServerError } from '../util/customErrors';
 
 export default class MemberTeamService {
   static async toggleFavoriteTeam(
     memberId: number,
     teamId: number,
-  ): Promise<UpdateResult | null> {
+  ): Promise<UpdateResult | boolean> {
     try {
       const memberTeam = await MemberTeamRepository.findOne({
         where: { member: { id: memberId }, team: { id: teamId } },
       });
-      if (!memberTeam) return null;
+      if (!memberTeam) return true;
+
+      const team = await TeamRepository.findOne({ where: { id: teamId } });
+      if (!team) return false;
+
       const isFavor = memberTeam.isFavor;
       return await MemberTeamRepository.update(memberTeam.id, {
         isFavor: !isFavor,
@@ -25,12 +30,15 @@ export default class MemberTeamService {
   static async toggleHideTeam(
     memberId: number,
     teamId: number,
-  ): Promise<UpdateResult | null> {
+  ): Promise<UpdateResult | boolean> {
     try {
       const memberTeam = await MemberTeamRepository.findOne({
         where: { member: { id: memberId }, team: { id: teamId } },
       });
-      if (!memberTeam) return null;
+      if (!memberTeam) return true;
+      const team = await TeamRepository.findOne({ where: { id: teamId } });
+      if (!team) return false;
+
       const isHide = memberTeam.isHide;
       return await MemberTeamRepository.update(memberTeam.id, {
         isHide: !isHide,
@@ -43,12 +51,19 @@ export default class MemberTeamService {
   static async inviteMember(
     memberId: number,
     teamId: number,
-  ): Promise<InsertResult | null> {
+    userId: number,
+  ): Promise<InsertResult | boolean> {
     try {
       const memberTeam = await MemberTeamRepository.findOne({
         where: { member: { id: memberId }, team: { id: teamId } },
       });
-      if (memberTeam) return null;
+      if (memberTeam) return true;
+
+      const userTeam = await MemberTeamRepository.findOne({
+        where: { member: { id: userId }, team: { id: teamId } },
+      });
+      if (!userTeam) return false;
+
       return await MemberTeamRepository.insert({
         member: { id: memberId },
         team: { id: teamId },
@@ -66,18 +81,19 @@ export default class MemberTeamService {
     teamId: number,
     isAdmin: boolean,
     userId: number,
-  ): Promise<UpdateResult | null> {
+  ): Promise<UpdateResult | boolean> {
     try {
-      const memberTeam = await MemberTeamRepository.find({
+      const memberTeam = await MemberTeamRepository.findOne({
         where: { member: { id: userId }, team: { id: teamId } },
       });
-      if (memberTeam[0].isAdmin != true) return null;
+      if (memberTeam?.isAdmin != true) return true;
 
-      const memberTeam2 = await MemberTeamRepository.find({
+      const memberTeam2 = await MemberTeamRepository.findOne({
         where: { member: { id: memberId }, team: { id: teamId } },
       });
+      if (!memberTeam2) return false;
 
-      return await MemberTeamRepository.update(memberTeam2[0].id, {
+      return await MemberTeamRepository.update(memberTeam2.id, {
         isAdmin: isAdmin,
       });
     } catch (error) {
@@ -88,12 +104,15 @@ export default class MemberTeamService {
   static async subsTeam(
     memberId: number,
     teamId: number,
-  ): Promise<InsertResult | null> {
+  ): Promise<InsertResult | boolean> {
     try {
       const memberTeam = await MemberTeamRepository.find({
         where: { member: { id: memberId }, team: { id: teamId } },
       });
-      if (memberTeam[0]) return null;
+      if (memberTeam[0]) return true;
+      const team = await TeamRepository.findOne({ where: { id: teamId } });
+      if (!team) return false;
+
       return await MemberTeamRepository.insert({
         member: { id: memberId },
         team: { id: teamId },
