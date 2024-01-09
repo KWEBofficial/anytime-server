@@ -1,4 +1,5 @@
 import Team from '../entity/team.entity';
+import MemberTeam from '../entity/memberTeam.entity';
 import TeamRepository from '../repository/team.repository';
 import { TeamCreateReqDTO, TeamUpdateReqDTO } from '../type/team.dto';
 import { InternalServerError } from '../util/customErrors';
@@ -13,6 +14,20 @@ export default class TeamService {
     }
   }
 
+  static async getTeamByName(keyword: string): Promise<Team[]> {
+    try {
+      if (keyword == '') {
+        return await TeamRepository.find();
+      } else {
+        return await TeamRepository.createQueryBuilder('team')
+          .where('team.teamname LIKE :keyword', { keyword: `%${keyword}%` })
+          .getMany();
+      }
+    } catch (error) {
+      throw new InternalServerError('팀 정보를 검색하는데 실패했습니다.');
+    }
+  }
+
   static async getTeamById(id: number): Promise<Team | null> {
     try {
       return await TeamRepository.findOne({ where: { id } });
@@ -21,20 +36,39 @@ export default class TeamService {
     }
   }
 
+  /*
+  static async getTeamByMember(id: number) {
+    try {
+      return await TeamRepository
+      .createQueryBuilder('t')
+      .leftJoinAndSelect(MemberTeam, 'm','m.team')
+      .getRawMany();
+
+
+    } catch (error) {
+      
+    }
+  }
+  */
+
   static async updateTeam(id: number, team: TeamUpdateReqDTO): Promise<Team> {
     try {
       const teamEntity = await TeamRepository.findOne({ where: { id } });
-      const updateEntity = await TeamRepository.create(team);
+      if (!teamEntity) throw new InternalServerError('존재하지 않는 팀입니다.');
+      teamEntity.color = team.color;
+      teamEntity.explanation = team.explanation;
+      teamEntity.teamname = team.teamname;
 
-      return await TeamRepository.save(teamEntity, updateEntity);
+      return await TeamRepository.save(teamEntity);
     } catch (error) {
       throw new InternalServerError('팀 정보를 수정하는데 실패했습니다.');
     }
   }
 
-  static async deleteTeam(id: number): Promise<Team> {
+  static async deleteTeam(id: number): Promise<boolean> {
     try {
-      return await TeamRepository.softDelete({ id: id });
+      const result = await TeamRepository.softDelete({ id: id });
+      return result.affected ? true : false;
     } catch (error) {
       throw new InternalServerError('팀 정보를 삭제하는데 실패했습니다.');
     }

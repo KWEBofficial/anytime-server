@@ -18,7 +18,7 @@ export interface MyTeamResDTO {
 }
 
 export interface TeamListResDTO {
-  teamId: number;
+  id: number;
   teamname: string;
   color: number;
   explanation: string;
