@@ -5,7 +5,9 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
+import Alarm from './alarm.entity';
 
 @Entity()
 export default class Schedule {
@@ -46,4 +48,7 @@ export default class Schedule {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
+
+  @OneToMany(() => Alarm, (alarm) => alarm.schedule)
+  alarms!: Alarm[];
 }

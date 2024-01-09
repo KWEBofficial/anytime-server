@@ -3,9 +3,13 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import MemberTeam from './memberTeam.entity';
+import MemberSchedule from './memberSchedule.entity';
+import Alarm from './alarm.entity';
 
 @Entity()
 export default class Member {
@@ -45,4 +49,13 @@ export default class Member {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
+
+  @OneToMany(() => MemberTeam, (memberTeam) => memberTeam.member)
+  teams!: MemberTeam[];
+
+  @OneToMany(() => MemberSchedule, (memberSchedule) => memberSchedule.member)
+  schedules!: MemberSchedule[];
+
+  @OneToMany(() => Alarm, (alarm) => alarm.member)
+  alarms!: Alarm[];
 }
