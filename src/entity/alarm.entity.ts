@@ -5,25 +5,29 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
-  ManyToOne,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
-import Member from './member.entity';
-import Team from './team.entity';
-import Schedule from './schedule.entity';
+import member from './member.entity';
+import team from './team.entity';
+import schedule from './schedule.entity';
 
 @Entity()
 export default class Alarm {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Member, (member) => member.alarms)
-  member!: Member;
+  @OneToOne(() => member)
+  @JoinColumn()
+  member!: member;
 
-  @ManyToOne(() => Team, (team) => team.alarms)
-  team!: Team;
+  @OneToOne(() => team)
+  @JoinColumn()
+  team!: team;
 
-  @ManyToOne(() => Schedule, (schedule) => schedule.alarms)
-  schedule!: Schedule;
+  @OneToOne(() => schedule)
+  @JoinColumn()
+  schedule!: schedule;
 
   @Column({
     type: 'varchar',
@@ -37,7 +41,7 @@ export default class Alarm {
     nullable: false,
     default: 0,
   })
-  isRead!: boolean;
+  isRead!: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;

@@ -21,7 +21,8 @@ export const createTeam: RequestHandler = async (req, res, next) => {
       req.body as TeamCreateReqDTO;
     const createTeamInput = { teamname, color, explanation, isPublic };
 
-    const team = await TeamService.saveTeam(createTeamInput);
+    const team = await TeamService.createTeam(createTeamInput);
+    // memberTeam table에도 정보(team.id, memberId) 추가 (팀 구독 or 초대)
 
     res.status(201).json(team.id);
   } catch (error) {
@@ -30,9 +31,16 @@ export const createTeam: RequestHandler = async (req, res, next) => {
 };
 
 //userId에 해당하는 team 정보 가져오기
-export const MyTeam: RequestHandler = async (req, res, next) => {
+export const myTeam: RequestHandler = async (req, res, next) => {
   try {
     const memberId = req.session.passport?.user;
+    if (!memberId) res.status(403).json();
+    else {
+      const teams = (await TeamService.getTeamByMember(
+        memberId,
+      )) as TeamListResDTO[];
+      res.status(200).json(teams);
+    }
   } catch (error) {
     next(error);
   }
@@ -77,7 +85,7 @@ export const showTeam: RequestHandler = async (req, res, next) => {
 
     // team id로 schedule 찾기 - ScheduleService
     // team id로 notice 찾기 - NoticeService
-    // team id로 member 찾기
+    // team id로 member 찾기 - memberTeam table
     // user id로 해당 team의 admin인지 확인
   } catch (error) {
     next(error);
@@ -88,6 +96,7 @@ export const deleteTeam: RequestHandler = async (req, res, next) => {
   try {
     const id = Number(req.params.teamId);
     const result = await TeamService.deleteTeam(id);
+
     if (result) res.status(200).json();
     else res.status(400).json();
   } catch (error) {

@@ -5,7 +5,7 @@ import { TeamCreateReqDTO, TeamUpdateReqDTO } from '../type/team.dto';
 import { InternalServerError } from '../util/customErrors';
 
 export default class TeamService {
-  static async saveTeam(createTeamInput: TeamCreateReqDTO): Promise<Team> {
+  static async createTeam(createTeamInput: TeamCreateReqDTO): Promise<Team> {
     try {
       const teamEntity = await TeamRepository.create(createTeamInput);
       return await TeamRepository.save(teamEntity);
@@ -36,20 +36,22 @@ export default class TeamService {
     }
   }
 
-  /*
   static async getTeamByMember(id: number) {
     try {
-      return await TeamRepository
-      .createQueryBuilder('t')
-      .leftJoinAndSelect(MemberTeam, 'm','m.team')
-      .getRawMany();
-
-
-    } catch (error) {
-      
-    }
+      return await TeamRepository.createQueryBuilder('t')
+        .leftJoin(MemberTeam, 'm', 'm.team_id = t.id')
+        .select([
+          't.id AS teamId',
+          't.teamname AS teamname',
+          't.is_public AS isPublic',
+          'm.is_admin AS isAdmin',
+          'm.is_favor AS isFavor',
+          'm.is_hide AS isHide',
+        ])
+        .where('m.member_id = :id', { id: id })
+        .getRawMany();
+    } catch (error) {}
   }
-  */
 
   static async updateTeam(id: number, team: TeamUpdateReqDTO): Promise<Team> {
     try {

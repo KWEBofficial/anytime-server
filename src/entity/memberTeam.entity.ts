@@ -5,42 +5,45 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
-  ManyToOne,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
-import Member from './member.entity';
-import Team from './team.entity';
+import member from './member.entity';
+import team from './team.entity';
 
 @Entity()
 export default class MemberTeam {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @ManyToOne(() => Member, (member) => member.teams)
-  member!: Member;
+  @OneToOne(() => member)
+  @JoinColumn()
+  member!: member;
 
-  @ManyToOne(() => Team, (team) => team.members)
-  team!: Team;
-
-  @Column({
-    type: 'tinyint',
-    nullable: false,
-    default: 0,
-  })
-  isAdmin!: boolean;
+  @OneToOne(() => team)
+  @JoinColumn()
+  team!: team;
 
   @Column({
     type: 'tinyint',
     nullable: false,
     default: 0,
   })
-  isHide!: boolean;
+  isAdmin!: number;
 
   @Column({
     type: 'tinyint',
     nullable: false,
     default: 0,
   })
-  isFavor!: boolean;
+  isHide!: number;
+
+  @Column({
+    type: 'tinyint',
+    nullable: false,
+    default: 0,
+  })
+  isFavor!: number;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;
