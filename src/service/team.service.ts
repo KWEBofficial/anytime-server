@@ -40,10 +40,15 @@ export default class TeamService {
   static async getTeamByName(keyword: string): Promise<Team[]> {
     try {
       if (keyword == '') {
-        return await TeamRepository.find();
+        return await TeamRepository.find({
+          where: {
+            isPublic: true,
+          },
+        });
       } else {
         return await TeamRepository.createQueryBuilder('team')
           .where('team.teamname LIKE :keyword', { keyword: `%${keyword}%` })
+          .andWhere('team.is_public = true')
           .getMany();
       }
     } catch (error) {
