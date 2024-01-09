@@ -21,10 +21,13 @@ export const createTeam: RequestHandler = async (req, res, next) => {
       req.body as TeamCreateReqDTO;
     const createTeamInput = { teamname, color, explanation, isPublic };
 
-    const team = await TeamService.createTeam(createTeamInput);
+    const memberId = req.session.passport?.user;
+    if (!memberId) res.status(403).json();
+    else {
+      const team = await TeamService.createTeam(createTeamInput, memberId);
+      res.status(201).json(team.id);
+    }
     // memberTeam table에도 정보(team.id, memberId) 추가 (팀 구독 or 초대)
-
-    res.status(201).json(team.id);
   } catch (error) {
     next(error);
   }
@@ -97,7 +100,7 @@ export const deleteTeam: RequestHandler = async (req, res, next) => {
     const id = Number(req.params.teamId);
     const result = await TeamService.deleteTeam(id);
 
-    if (result) res.status(200).json();
+    if (result) res.status(200).json({ message: 'delete' });
     else res.status(400).json();
   } catch (error) {
     next(error);

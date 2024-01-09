@@ -1,16 +1,39 @@
 import Team from '../entity/team.entity';
 import MemberTeam from '../entity/memberTeam.entity';
 import TeamRepository from '../repository/team.repository';
+import MemberTeamRepository from '../repository/memberTeam.repository';
 import { TeamCreateReqDTO, TeamUpdateReqDTO } from '../type/team.dto';
 import { InternalServerError } from '../util/customErrors';
+import Member from '../entity/member.entity';
 
 export default class TeamService {
-  static async createTeam(createTeamInput: TeamCreateReqDTO): Promise<Team> {
+  static async createTeam(
+    createTeamInput: TeamCreateReqDTO,
+    id: number,
+  ): Promise<Team> {
     try {
       const teamEntity = await TeamRepository.create(createTeamInput);
-      return await TeamRepository.save(teamEntity);
+      const team = await TeamRepository.save(teamEntity);
+      await TeamService.createMemberTeam(id, team.id);
+      return team;
     } catch (error) {
+      console.log(error);
       throw new InternalServerError('팀 정보를 저장하는데 실패했습니다.');
+    }
+  }
+
+  static async createMemberTeam(memberId: number, teamId: number) {
+    try {
+      return await MemberTeamRepository.insert({
+        member: { id: memberId },
+        team: { id: teamId },
+        isAdmin: 1,
+        isHide: 0,
+        isFavor: 0,
+      });
+    } catch (error) {
+      console.log(error);
+      throw new InternalServerError('팀-멤버 정보를 저장하는데 실패했습니다.');
     }
   }
 
