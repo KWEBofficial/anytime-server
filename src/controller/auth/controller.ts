@@ -3,12 +3,13 @@ import { MemberRegisterReqDTO } from '../../type/member.dto';
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 import MemberService from '../../service/member.service';
+import { BadRequestError, UnauthorizedError } from '../../util/customErrors';
 
 export const isLoggedIn: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
   } else {
-    res.status(401).send('로그인이 필요합니다');
+    throw new UnauthorizedError('로그인이 필요합니다.');
   }
 };
 
@@ -16,36 +17,38 @@ export const isNotLoggedIn: RequestHandler = (req, res, next) => {
   if (!req.isAuthenticated()) {
     next();
   } else {
-    res.status(401).send('이미 로그인 됨');
+    throw new UnauthorizedError('이미 로그인 되었습니다.');
   }
 };
 
-export const loginMember: RequestHandler = async (req, res) => {
+export const loginMember: RequestHandler = async (req, res, next) => {
   await passport.authenticate(
     'local',
     (err: string, user: Express.User, options: { message: string }) => {
-      if (user) {
-        req.login(user, (error) => {
-          if (error) {
-            console.log(options.message);
-            return res.status(400).json();
-          } else {
-            console.log('Successfully authenticated');
-            return res.status(200).json();
-          }
-        });
-      } else {
-        console.log(options.message);
-        return res.status(400).json();
+      try {
+        if (user) {
+          req.login(user, (error) => {
+            if (error) {
+              throw new BadRequestError(options.message);
+            } else {
+              console.log('로그인 되었습니다.');
+              return res.status(200).json();
+            }
+          });
+        } else {
+          throw new BadRequestError(options.message);
+        }
+      } catch (error) {
+        next(error);
       }
     },
-  )(req, res);
+  )(req, res, next);
 };
 
 export const logoutMember: RequestHandler = async (req, res) => {
   req.logout((error) => {
     if (error) {
-      return res.status(400).json();
+      throw new BadRequestError('잘못된 요청입니다.');
     } else {
       return res.status(200).json({ message: '로그아웃 완료' });
     }
@@ -58,8 +61,8 @@ export const registerMember: RequestHandler = async (req, res, next) => {
     const uniqueFind = await MemberService.getMemberByEmail(
       memberRegisterReqDTO.email,
     );
-    if (uniqueFind)
-      return res.status(400).json({ message: '이미 존재하는 이메일입니다.' });
+    if (uniqueFind) throw new BadRequestError('이미 존재하는 이메일입니다.');
+
     const hash = await bcrypt.hash(memberRegisterReqDTO.password, 1);
     MemberService.saveMember(
       memberRegisterReqDTO.email,
