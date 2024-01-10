@@ -1,8 +1,9 @@
 import { RequestHandler } from 'express';
 import {
-  //AllScheSearchResDTO,
+  AllScheSearchResDTO,
   ScheduleDTO,
-  //TeamMemScheDTO,
+  TeamScheResDTO,
+  TeamMemScheDTO,
 } from '../../type/schedule.dto';
 declare module 'express-session' {
   interface SessionData {
@@ -13,6 +14,7 @@ declare module 'express-session' {
 }
 
 import ScheService from '../../service/schedule.service';
+import Team from '../../entity/team.entity';
 
 export const ScheAdd: RequestHandler = async (req, res, next) => {
   try {
@@ -53,38 +55,45 @@ export const TeamScheAdd: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-/*
+
 export const AllScheSearch: RequestHandler = async (req, res, next) => {
   try {
     const memberId = req.session.passport?.user;
-    const scheduleIds = await MemScheRepository.find({
-      where: { member: memberId },
-    });
-    const schedules = await ScheRepository.find({
-      where: { id: scheduleIds },
-    });
-    if (schedules != null) {
-      const AllScheSearchRes: AllScheSearchResDTO = schedules;
+    if (memberId !== undefined) {
+      const member = await ScheService.MemFindById(memberId);
+      const ownSchedule: ScheduleDTO[] =
+        await ScheService.MemToScheduleDTOs(member);
+      const teams: Team[] = await ScheService.BelongTeamsFind(member);
+      const teamSchedules: TeamScheResDTO[] = await Promise.all(
+        teams.map(async (t) => {
+          const firstmap: TeamScheResDTO = {
+            teamId: t.id,
+            teamname: t.teamname,
+            schedules: await ScheService.TeamToScheduleDTOs(t),
+          };
+          return firstmap;
+        }),
+      );
+      const AllScheSearchRes: AllScheSearchResDTO = {
+        mySchedules: ownSchedule,
+        teamSchedules: teamSchedules,
+      };
       return res.status(200).json(AllScheSearchRes);
     } else {
-      return res.status(400);
+      throw new Error('memberId:undefined');
     }
   } catch (error) {
     next(error);
   }
 };
-*/
+
 export const OneScheSearch: RequestHandler = async (req, res, next) => {
   try {
     const scheduleId = req.params.scheduleId as unknown as number;
     const schedule = await ScheService.ScheFindById(scheduleId);
     if (schedule != null) {
-      const oneScheSearchRes: ScheduleDTO = {
-        name: schedule.schedulename,
-        startTime: schedule.startTime,
-        endTime: schedule.endTime,
-        explanation: schedule.explanation,
-      };
+      const oneScheSearchRes: ScheduleDTO =
+        await ScheService.ScheToScheduleDTO(schedule);
       res.status(200).json(oneScheSearchRes);
     } else {
       return res.status(400);
@@ -119,7 +128,7 @@ export const ScheDelete: RequestHandler = async (req, res, next) => {
     const scheduleId = req.params as unknown as number;
     const schedule = await ScheService.ScheFindById(scheduleId);
     if (schedule != null) {
-      schedule.deletedAt = await new Date();
+      schedule.deletedAt = new Date();
       await ScheService.ScheSave(schedule);
       return res.status(200);
     } else {
@@ -129,24 +138,22 @@ export const ScheDelete: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-/*
+
 export const TeamMemScheSearch: RequestHandler = async (req, res, next) => {
   try {
     const teamId = req.params.teamId as unknown as number;
-    const members = ScheService.TeamMemFind(teamId);
-    const scheduleIds = await MemScheRepository.find({
-      where: { member: memberIds },
-    });
-    const schedules = await ScheRepository.find({
-      where: { id: scheduleIds },
-    });
-    if (schedules != null) {
-      const teamMemScheSearchRes: TeamMemScheDTO = schedules;
-      return res.status(200).json(teamMemScheSearchRes);
-    } else {
-      return res.status(400);
-    }
+    const members = await ScheService.TeamMemFind(teamId);
+    const TeamMemSches: TeamMemScheDTO[] = await Promise.all(
+      members.map(async (t) => {
+        const TeamMemSche: TeamMemScheDTO = {
+          memberId: t.id,
+          schedules: await ScheService.MemToScheResDTOs(t),
+        };
+        return TeamMemSche;
+      }),
+    );
+    return res.status(200).json(TeamMemSches);
   } catch (error) {
     next(error);
   }
-};*/
+};

@@ -1,4 +1,5 @@
 import {
+  ScheResDTO,
   //AllScheSearchResDTO,
   ScheduleDTO,
   //TeamMemScheDTO,
@@ -13,7 +14,7 @@ import TeamSchedule from '../entity/teamSchedule.entity';
 import ScheRepository from '../repository/schedule.repository';
 import MemScheRepository from '../repository/memberSchedule.repository';
 import TeamScheRepository from '../repository/teamSchedule.repository';
-//import MemTeamRepository from '../repository/memberTeam.repository';
+import MemTeamRepository from '../repository/memberTeam.repository';
 import MemberRepository from '../repository/member.repository';
 import TeamRepository from '../repository/team.repository';
 
@@ -71,6 +72,54 @@ export default class ScheService {
     }
   }
 
+  static async BelongTeamsFind(memberin: Member): Promise<Team[]> {
+    try {
+      const relations = await MemTeamRepository.find({
+        where: { member: memberin },
+      });
+      const teams = relations.map((t) => t.team);
+      if (teams !== undefined) {
+        return teams;
+      } else {
+        throw new Error('belongteam:undefined');
+      }
+    } catch (error) {
+      throw new Error('belongteamFind:Fail');
+    }
+  }
+
+  static async ScheFindByMem(memberin: Member): Promise<Schedule[]> {
+    try {
+      const relations = await MemScheRepository.find({
+        where: { member: memberin },
+      });
+      const schedules = await relations.map((t) => t.schedule);
+      if (schedules !== undefined) {
+        return schedules;
+      } else {
+        throw new Error('schefindbymem:undefined');
+      }
+    } catch (error) {
+      throw new Error('ScheFindByMem Failure');
+    }
+  }
+
+  static async ScheFindByTeam(teamin: Team): Promise<Schedule[]> {
+    try {
+      const relations = await TeamScheRepository.find({
+        where: { team: teamin },
+      });
+      const schedules = await relations.map((t) => t.schedule);
+      if (schedules !== undefined) {
+        return schedules;
+      } else {
+        throw new Error('schefindby:teamundefined');
+      }
+    } catch (error) {
+      throw new Error('ScheFindByTeam Failure');
+    }
+  }
+
   static async ScheFindById(scheduleId: number): Promise<Schedule> {
     try {
       const schedule = await ScheRepository.findOne({
@@ -87,13 +136,13 @@ export default class ScheService {
   }
 
   static async MemScheAdd(
-    member: Member,
-    schedule: Schedule,
+    memberin: Member,
+    schedulein: Schedule,
   ): Promise<MemberSchedule> {
     try {
       const memSche = await MemScheRepository.save({
-        Member: member,
-        schedule: schedule,
+        member: memberin,
+        schedule: schedulein,
       });
       return memSche;
     } catch (error) {
@@ -102,13 +151,13 @@ export default class ScheService {
   }
 
   static async TeamScheAdd(
-    team: Team,
-    schedule: Schedule,
+    teamin: Team,
+    schedulein: Schedule,
   ): Promise<TeamSchedule> {
     try {
       const teamSche = await TeamScheRepository.save({
-        Team: team,
-        schedule: schedule,
+        team: teamin,
+        schedule: schedulein,
       });
       return teamSche;
     } catch (error) {
@@ -116,21 +165,101 @@ export default class ScheService {
     }
   }
 
-  /*static async TeamMemFind(teamId: number): Promise<Member[]> {
+  static async TeamMemFind(teamId: number): Promise<Member[]> {
     try {
-      const team = await ScheService.TeamFindById(teamId);
-      const relation[] = await MemTeamRepository.find({
-        where: { team: team },
+      const teamin = await ScheService.TeamFindById(teamId);
+      const relations = await MemTeamRepository.find({
+        where: { team: teamin },
       });
-      const members: Member[] 
-      if (members !== null) {
+      const members = relations.map((t) => t.member);
+      if (members !== undefined) {
         return members;
+      } else {
+        throw new Error('member:undefined');
       }
     } catch (error) {
       throw new Error('team-mem failure');
     }
-  }*/
+  }
 
+  static async MemToScheduleDTOs(memberin: Member): Promise<ScheduleDTO[]> {
+    try {
+      const ScheduleDTOs: ScheduleDTO[] = await Promise.all(
+        (await ScheService.ScheFindByMem(memberin)).map(async (t) => {
+          const map: ScheduleDTO = await ScheService.ScheToScheduleDTO(t);
+          return map;
+        }),
+      );
+      return ScheduleDTOs;
+    } catch (error) {
+      throw new Error('memtoschedto failure');
+    }
+  }
+
+  static async TeamToScheduleDTOs(teamin: Team): Promise<ScheduleDTO[]> {
+    try {
+      const ScheduleDTOs: ScheduleDTO[] = await Promise.all(
+        (await ScheService.ScheFindByTeam(teamin)).map(async (t) => {
+          const map: ScheduleDTO = await ScheService.ScheToScheduleDTO(t);
+          return map;
+        }),
+      );
+      return ScheduleDTOs;
+    } catch (error) {
+      throw new Error('teamtoschedto failure');
+    }
+  }
+
+  static async ScheToScheduleDTO(schedulein: Schedule): Promise<ScheduleDTO> {
+    try {
+      const scheduleDTO: ScheduleDTO = {
+        name: schedulein.schedulename,
+        startTime: schedulein.startTime,
+        endTime: schedulein.endTime,
+        explanation: schedulein.explanation,
+      };
+      return scheduleDTO;
+    } catch (error) {
+      throw new Error('schetoscheduledto failure');
+    }
+  }
+
+  static async ScheToScheResDTO(schedulein: Schedule): Promise<ScheResDTO> {
+    try {
+      const scheResDTO: ScheResDTO = {
+        startTime: schedulein.startTime,
+        endTime: schedulein.endTime,
+      };
+      return scheResDTO;
+    } catch (error) {
+      throw new Error('schetoscheresdto failure');
+    }
+  }
+
+  static async MemToScheResDTOs(memberin: Member): Promise<ScheResDTO[]> {
+    try {
+      const ownSchedule: Schedule[] = await ScheService.ScheFindByMem(memberin);
+      const teams: Team[] = await ScheService.BelongTeamsFind(memberin);
+      const eachTeamSchedule = await teams.map(
+        async (t) => await ScheService.ScheFindByTeam(t),
+      );
+      const teamSchedule: Schedule[] = await [];
+      eachTeamSchedule.map(async (a) => teamSchedule.concat(await a));
+      const memSchedule: Schedule[] = ownSchedule.concat(teamSchedule);
+
+      const ScheResDTOs: ScheResDTO[] = await Promise.all(
+        memSchedule.map(async (t) => await ScheService.ScheToScheResDTO(t)),
+      );
+      return ScheResDTOs;
+    } catch (error) {
+      throw new Error('memtoscheresdtos failure');
+    }
+  }
+  //static async ScheToScheResDTO(schedulein: Schedule): Promise<Schedule>
+
+  /*static async MemSchedulesFind(members: Member[]): Promise<number[]> {
+    const ownSche = await ScheService.;
+  }
   /*static async AllScheFind(memberId: number): Promise<AllScheSearchResDTO> {
     try {
       const member = await ScheService.MemFindById(memberId);

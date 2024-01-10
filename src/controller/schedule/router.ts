@@ -12,12 +12,12 @@ import {
 
 const scheRouter = Router();
 
-scheRouter.post('/schedule/create', isLoggedIn, ScheAdd);
-scheRouter.post('/schedule/create/:teamId', isLoggedIn, TeamScheAdd);
-scheRouter.get('/schedule', isLoggedIn, AllScheSearch);
-scheRouter.get('/schedule/:scheduleId', isLoggedIn, OneScheSearch);
-scheRouter.patch('/schedule/:scheduleId', isLoggedIn, ScheEdit);
-scheRouter.delete('/schedule/:scheduleId', isLoggedIn, ScheDelete);
-scheRouter.get('/schedule/team/:teamId', isLoggedIn, TeamMemScheSearch);
+scheRouter.post('/create', isLoggedIn, ScheAdd);
+scheRouter.post('/create/:teamId', isLoggedIn, TeamScheAdd);
+scheRouter.get('/', isLoggedIn, AllScheSearch);
+scheRouter.get('/:scheduleId', isLoggedIn, OneScheSearch);
+scheRouter.patch('/:scheduleId', isLoggedIn, ScheEdit);
+scheRouter.delete('/:scheduleId', isLoggedIn, ScheDelete);
+scheRouter.get('/team/:teamId', isLoggedIn, TeamMemScheSearch);
 
 export default scheRouter;
