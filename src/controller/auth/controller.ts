@@ -3,7 +3,13 @@ import { MemberRegisterReqDTO } from '../../type/member.dto';
 import passport from 'passport';
 import bcrypt from 'bcrypt';
 import MemberService from '../../service/member.service';
-
+declare module 'express-session' {
+  interface SessionData {
+    passport: {
+      user: number;
+    };
+  }
+}
 export const isLoggedIn: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
@@ -62,6 +68,7 @@ export const registerMember: RequestHandler = async (req, res, next) => {
 };
 
 export const test: RequestHandler = (req, res) => {
-  console.log(req.user);
+  const id = req.session.passport?.user;
+  console.log(id);
   return res.status(200).json();
 };
