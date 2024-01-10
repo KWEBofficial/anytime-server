@@ -1,8 +1,8 @@
 import { RequestHandler } from 'express';
 import {
-  AllScheSearchResDTO,
+  //AllScheSearchResDTO,
   ScheduleDTO,
-  TeamMemScheDTO,
+  //TeamMemScheDTO,
 } from '../../type/schedule.dto';
 declare module 'express-session' {
   interface SessionData {
@@ -53,7 +53,7 @@ export const TeamScheAdd: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-
+/*
 export const AllScheSearch: RequestHandler = async (req, res, next) => {
   try {
     const memberId = req.session.passport?.user;
@@ -73,7 +73,7 @@ export const AllScheSearch: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-
+*/
 export const OneScheSearch: RequestHandler = async (req, res, next) => {
   try {
     const scheduleId = req.params.scheduleId as unknown as number;
@@ -129,13 +129,11 @@ export const ScheDelete: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
-
+/*
 export const TeamMemScheSearch: RequestHandler = async (req, res, next) => {
   try {
     const teamId = req.params.teamId as unknown as number;
-    const memberIds = await MemTeamRepository.find({
-      where: { team: teamId },
-    });
+    const members = ScheService.TeamMemFind(teamId);
     const scheduleIds = await MemScheRepository.find({
       where: { member: memberIds },
     });
@@ -151,4 +149,4 @@ export const TeamMemScheSearch: RequestHandler = async (req, res, next) => {
   } catch (error) {
     next(error);
   }
-};
+};*/

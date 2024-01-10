@@ -1,9 +1,9 @@
 import {
-  AllScheSearchResDTO,
+  //AllScheSearchResDTO,
   ScheduleDTO,
-  TeamMemScheDTO,
+  //TeamMemScheDTO,
 } from '../type/schedule.dto';
-import { InternalServerError } from '../util/customErrors';
+//import { InternalServerError } from '../util/customErrors';
 import Member from '../entity/member.entity';
 import Team from '../entity/team.entity';
 import Schedule from '../entity/schedule.entity';
@@ -13,10 +13,9 @@ import TeamSchedule from '../entity/teamSchedule.entity';
 import ScheRepository from '../repository/schedule.repository';
 import MemScheRepository from '../repository/memberSchedule.repository';
 import TeamScheRepository from '../repository/teamSchedule.repository';
-import MemTeamRepository from '../repository/memberTeam.repository';
+//import MemTeamRepository from '../repository/memberTeam.repository';
 import MemberRepository from '../repository/member.repository';
 import TeamRepository from '../repository/team.repository';
-import { AllScheSearch } from '../controller/schedule/controller';
 
 export default class ScheService {
   static async ScheAdd(scheAddReq: ScheduleDTO): Promise<Schedule> {
@@ -33,8 +32,8 @@ export default class ScheService {
     }
   }
 
-  static async ScheSave(schedule:Schedule): Promise<Schedule>{ 
-    try{
+  static async ScheSave(schedule: Schedule): Promise<Schedule> {
+    try {
       const resultsche = await ScheRepository.save(schedule);
       return resultsche;
     } catch (error) {
@@ -117,7 +116,22 @@ export default class ScheService {
     }
   }
 
-  static async AllScheFind(memberId: number): Promise<AllScheSearchResDTO> {
+  /*static async TeamMemFind(teamId: number): Promise<Member[]> {
+    try {
+      const team = await ScheService.TeamFindById(teamId);
+      const relation[] = await MemTeamRepository.find({
+        where: { team: team },
+      });
+      const members: Member[] 
+      if (members !== null) {
+        return members;
+      }
+    } catch (error) {
+      throw new Error('team-mem failure');
+    }
+  }*/
+
+  /*static async AllScheFind(memberId: number): Promise<AllScheSearchResDTO> {
     try {
       const member = await ScheService.MemFindById(memberId);
       const team[] = await 
@@ -131,7 +145,5 @@ export default class ScheService {
       const 
       return AllScheSearchRes
     } catch (error) {}
-  }
-
-
+  }*/
 }
