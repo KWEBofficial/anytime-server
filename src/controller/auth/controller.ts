@@ -5,6 +5,14 @@ import bcrypt from 'bcrypt';
 import MemberService from '../../service/member.service';
 import { BadRequestError, UnauthorizedError } from '../../util/customErrors';
 
+declare module 'express-session' {
+  interface SessionData {
+    passport: {
+      user: number;
+    };
+  }
+}
+
 export const isLoggedIn: RequestHandler = (req, res, next) => {
   if (req.isAuthenticated()) {
     next();
@@ -76,6 +84,8 @@ export const registerMember: RequestHandler = async (req, res, next) => {
 };
 
 export const test: RequestHandler = (req, res) => {
+
   console.log(req.session.passport?.user);
+
   return res.status(200).json();
 };
