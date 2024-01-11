@@ -1,7 +1,7 @@
 import Alarm from '../entity/alarm.entity';
 import AlarmRepository from '../repository/alarm.repository';
 import { BadRequestError, InternalServerError } from '../util/customErrors';
-import { DeleteResult } from 'typeorm';
+import { DeleteResult, InsertResult } from 'typeorm';
 
 export default class AlarmService {
   static async getAlarm(memberId: number): Promise<Alarm[]> {
@@ -40,6 +40,24 @@ export default class AlarmService {
       return await AlarmRepository.save(alarm);
     } catch (error) {
       throw new InternalServerError('알람 정보를 불러오는데 실패했습니다.');
+    }
+  }
+  
+  static async createInviteAlarm(
+    memberId: number,
+    teamId: number,
+  ): Promise<InsertResult> {
+    try {
+      const content = `${teamId} 그룹에 초대되었습니다.`;
+      return await AlarmRepository.insert({
+        member: { id: memberId },
+        team: { id: teamId },
+        schedule: { id: null } as any,
+        content: content,
+        isRead: false,
+      });
+    } catch (error) {
+      throw new InternalServerError('알람 생성에 실패했습니다.');
     }
   }
 
