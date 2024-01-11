@@ -26,4 +26,16 @@ export default class MemberService {
       throw new InternalServerError('유저 정보를 저장하는데 실패했습니다.');
     }
   }
+
+  static async findMember(memberId: number): Promise<Member | null> {
+    try {
+      const member = await MemberRepository.findOne({
+        where: { id: memberId },
+      });
+      if (!member) return null;
+      return member;
+    } catch (error) {
+      throw new InternalServerError('유저 정보를 불러오는데 실패했습니다.');
+    }
+  }
 }
