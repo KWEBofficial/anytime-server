@@ -75,9 +75,11 @@ export default class ScheService {
   static async BelongTeamsFind(memberin: Member): Promise<Team[]> {
     try {
       const relations = await MemTeamRepository.find({
-        where: { member: memberin },
+        where: { member: { id: memberin.id } },
+        relations: ['team'],
       });
-      const teams = relations.map((t) => t.team);
+      const preteams = relations.map((t) => t.team);
+      const teams = preteams.filter((t) => t !== null);
       if (teams !== undefined) {
         return teams;
       } else {
@@ -90,30 +92,13 @@ export default class ScheService {
 
   static async ScheFindByMem(memberin: Member): Promise<Schedule[]> {
     try {
-      console.log('schefindmem start');
       const relations = await MemScheRepository.find({
         where: { member: { id: memberin.id } },
+        relations: ['schedule'],
       });
-      console.log(relations);
-      const scheIds = relations.map((t) => t.schedule);
-      console.log(scheIds);
-      const schedules = await Promise.all(
-        await scheIds.map(async (t) => {
-          console.log(t);
-          const find = await ScheRepository.findOne({
-            where: { id: t.id },
-          });
-          if (find !== null) {
-            console.log(find);
-            return find;
-          } else {
-            throw new Error('cannot find sche fitted to ids');
-          }
-        }),
-      );
-
+      const preschedules = relations.map((t) => t.schedule);
+      const schedules = preschedules.filter((t) => t !== null);
       if (schedules !== undefined) {
-        console.log(schedules);
         return schedules;
       } else {
         throw new Error('schefindbymem:undefined');
@@ -126,9 +111,11 @@ export default class ScheService {
   static async ScheFindByTeam(teamin: Team): Promise<Schedule[]> {
     try {
       const relations = await TeamScheRepository.find({
-        where: { team: teamin },
+        where: { team: { id: teamin.id } },
+        relations: ['schedule'],
       });
-      const schedules = await relations.map((t) => t.schedule);
+      const preschedules = relations.map((t) => t.schedule);
+      const schedules = preschedules.filter((t) => t !== null);
       if (schedules !== undefined) {
         return schedules;
       } else {
@@ -188,9 +175,11 @@ export default class ScheService {
     try {
       const teamin = await ScheService.TeamFindById(teamId);
       const relations = await MemTeamRepository.find({
-        where: { team: teamin },
+        where: { team: { id: teamin.id } },
+        relations: ['member'],
       });
-      const members = relations.map((t) => t.member);
+      const premembers = relations.map((t) => t.member);
+      const members = premembers.filter((t) => t !== null);
       if (members !== undefined) {
         return members;
       } else {
@@ -209,7 +198,7 @@ export default class ScheService {
           return map;
         }),
       );
-      return await ScheduleDTOs;
+      return ScheduleDTOs;
     } catch (error) {
       throw new Error('memtoschedto failure');
     }
@@ -259,13 +248,14 @@ export default class ScheService {
     try {
       const ownSchedule: Schedule[] = await ScheService.ScheFindByMem(memberin);
       const teams: Team[] = await ScheService.BelongTeamsFind(memberin);
-      const eachTeamSchedule = await teams.map(
-        async (t) => await ScheService.ScheFindByTeam(t),
+      const eachTeamSchedule = await Promise.all(
+        teams.map(async (t) => {
+          const ateamsche: Schedule[] = await ScheService.ScheFindByTeam(t);
+          return ateamsche;
+        }),
       );
-      const teamSchedule: Schedule[] = await [];
-      eachTeamSchedule.map(async (a) => teamSchedule.concat(await a));
+      const teamSchedule: Schedule[] = eachTeamSchedule.flat(1);
       const memSchedule: Schedule[] = ownSchedule.concat(teamSchedule);
-
       const ScheResDTOs: ScheResDTO[] = await Promise.all(
         memSchedule.map(async (t) => await ScheService.ScheToScheResDTO(t)),
       );

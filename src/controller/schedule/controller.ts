@@ -25,9 +25,11 @@ export const ScheAdd: RequestHandler = async (req, res, next) => {
       const schedule = await ScheService.ScheAdd(scheAddReq);
       const member = await ScheService.MemFindById(memberId);
       const memSche = await ScheService.MemScheAdd(member, schedule);
-      console.log(memSche.id);
-      console.log(schedule.id);
-      return res.status(200).json();
+      if (memSche != null) {
+        return res.status(200).json();
+      } else {
+        return res.status(400);
+      }
     } else {
       throw new Error('session failure');
     }
@@ -45,9 +47,11 @@ export const TeamScheAdd: RequestHandler = async (req, res, next) => {
       const schedule = await ScheService.ScheAdd(publicScheAddReq);
       const team = await ScheService.TeamFindById(teamId);
       const teamSche = await ScheService.TeamScheAdd(team, schedule);
-      console.log(teamSche.id);
-      console.log(schedule.id);
-      return res.status(200).json();
+      if (teamSche != null) {
+        return res.status(200).json();
+      } else {
+        return res.status(400);
+      }
     } else {
       throw new Error('session failure');
     }
