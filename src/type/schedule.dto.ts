@@ -1,7 +1,7 @@
 export interface ScheduleDTO {
   name: string;
-  startDate: Date;
-  endDate: Date;
+  startTime: Date;
+  endTime: Date;
   explanation: string;
 }
 
@@ -12,13 +12,13 @@ export interface TeamScheResDTO {
 }
 
 export interface AllScheSearchResDTO {
-  MySchedules: ScheduleDTO[];
-  TeamSchedules: TeamScheResDTO[];
+  mySchedules: ScheduleDTO[];
+  teamSchedules: TeamScheResDTO[];
 }
 
 export interface ScheResDTO {
-  startDate: Date;
-  endDate: Date;
+  startTime: Date;
+  endTime: Date;
 }
 
 export interface TeamMemScheDTO {
