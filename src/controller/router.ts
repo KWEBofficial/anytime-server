@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import userRouter from './user/router';
+import teamRouter from './team/router';
 import noticeRouter from './notice/router';
 import authRouter from './auth/router';
 import scheRouter from './schedule/router';
@@ -12,6 +13,7 @@ router.get('/', (req, res) => {
   res.send('hello');
 });
 router.use('/user', userRouter);
+router.use('/team', teamRouter);
 router.use('/notice', noticeRouter);
 router.use('/auth', authRouter);
 router.use('/schedule', scheRouter);
