@@ -5,7 +5,12 @@ import {
   DeleteDateColumn,
   UpdateDateColumn,
   PrimaryGeneratedColumn,
+  OneToMany,
 } from 'typeorm';
+import MemberTeam from './memberTeam.entity';
+import TeamSchedule from './teamSchedule.entity';
+import Notice from './notice.entity';
+import Alarm from './alarm.entity';
 
 @Entity()
 export default class Team {
@@ -37,7 +42,7 @@ export default class Team {
     nullable: false,
     default: 0,
   })
-  isPublic!: number;
+  isPublic!: boolean;
 
   @CreateDateColumn({ type: 'timestamp' })
   createdAt!: Date;
@@ -47,4 +52,16 @@ export default class Team {
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
+
+  @OneToMany(() => MemberTeam, (memberTeam) => memberTeam.team)
+  members!: MemberTeam[];
+
+  @OneToMany(() => TeamSchedule, (teamSchedule) => teamSchedule.team)
+  schedules!: TeamSchedule[];
+
+  @OneToMany(() => Notice, (notice) => notice.team)
+  notices!: Notice[];
+
+  @OneToMany(() => Alarm, (alarm) => alarm.team)
+  alarms!: Alarm[];
 }

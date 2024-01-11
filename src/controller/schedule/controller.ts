@@ -113,8 +113,12 @@ export const ScheEdit: RequestHandler = async (req, res, next) => {
       schedule.startTime = scheEditReq.startTime;
       schedule.endTime = scheEditReq.endTime;
       schedule.explanation = scheEditReq.explanation;
-      await ScheService.ScheSave(schedule);
-      return res.status(200);
+      const result = await ScheService.ScheSave(schedule);
+      if (result !== null) {
+        return res.status(200).json();
+      } else {
+        throw new Error('save failure');
+      }
     } else {
       throw new Error('schedule:null');
     }
@@ -125,14 +129,14 @@ export const ScheEdit: RequestHandler = async (req, res, next) => {
 
 export const ScheDelete: RequestHandler = async (req, res, next) => {
   try {
-    const scheduleId = req.params as unknown as number;
+    const scheduleId = req.params.scheduleId as unknown as number;
     const schedule = await ScheService.ScheFindById(scheduleId);
     if (schedule != null) {
       schedule.deletedAt = new Date();
       await ScheService.ScheSave(schedule);
-      return res.status(200);
+      return res.status(200).json();
     } else {
-      return res.status(400);
+      return res.status(400).json;
     }
   } catch (error) {
     next(error);

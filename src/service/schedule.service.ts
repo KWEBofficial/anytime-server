@@ -90,11 +90,30 @@ export default class ScheService {
 
   static async ScheFindByMem(memberin: Member): Promise<Schedule[]> {
     try {
+      console.log('schefindmem start');
       const relations = await MemScheRepository.find({
-        where: { member: memberin },
+        where: { member: { id: memberin.id } },
       });
-      const schedules = await relations.map((t) => t.schedule);
+      console.log(relations);
+      const scheIds = relations.map((t) => t.schedule);
+      console.log(scheIds);
+      const schedules = await Promise.all(
+        await scheIds.map(async (t) => {
+          console.log(t);
+          const find = await ScheRepository.findOne({
+            where: { id: t.id },
+          });
+          if (find !== null) {
+            console.log(find);
+            return find;
+          } else {
+            throw new Error('cannot find sche fitted to ids');
+          }
+        }),
+      );
+
       if (schedules !== undefined) {
+        console.log(schedules);
         return schedules;
       } else {
         throw new Error('schefindbymem:undefined');
@@ -190,7 +209,7 @@ export default class ScheService {
           return map;
         }),
       );
-      return ScheduleDTOs;
+      return await ScheduleDTOs;
     } catch (error) {
       throw new Error('memtoschedto failure');
     }
