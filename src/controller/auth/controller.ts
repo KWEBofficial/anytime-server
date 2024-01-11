@@ -84,7 +84,6 @@ export const registerMember: RequestHandler = async (req, res, next) => {
 };
 
 export const test: RequestHandler = (req, res) => {
-
   console.log(req.session.passport?.user);
 
   return res.status(200).json();
