@@ -81,10 +81,13 @@ export default class TeamService {
     } catch (error) {}
   }
 
-  static async updateTeam(id: number, team: TeamUpdateReqDTO): Promise<Team> {
+  static async updateTeam(
+    id: number,
+    team: TeamUpdateReqDTO,
+  ): Promise<Team | null> {
     try {
       const teamEntity = await TeamRepository.findOne({ where: { id } });
-      if (!teamEntity) throw new InternalServerError('존재하지 않는 팀입니다.');
+      if (!teamEntity) return null;
       teamEntity.color = team.color;
       teamEntity.explanation = team.explanation;
       teamEntity.teamname = team.teamname;

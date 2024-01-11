@@ -1,6 +1,7 @@
 import { RequestHandler } from 'express';
 import TeamService from '../../service/team.service';
 import {
+  MyTeamResDTO,
   TeamCreateReqDTO,
   TeamListResDTO,
   TeamUpdateReqDTO,
@@ -45,7 +46,7 @@ export const myTeam: RequestHandler = async (req, res, next) => {
     else {
       const teams = (await TeamService.getTeamByMember(
         memberId,
-      )) as TeamListResDTO[];
+      )) as MyTeamResDTO[];
       res.status(200).json(teams);
     }
   } catch (error) {
@@ -77,7 +78,8 @@ export const updateTeam: RequestHandler = async (req, res, next) => {
 
     const team = await TeamService.updateTeam(id, createTeamInput);
 
-    res.status(200).json(team.id);
+    if (!team) throw new BadRequestError('존재하지 않는 팀입니다.');
+    else res.status(200).json(team.id);
   } catch (error) {
     next(error);
   }
