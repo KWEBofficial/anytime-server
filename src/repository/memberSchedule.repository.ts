@@ -1,6 +1,8 @@
 import AppDataSource from '../config/dataSource';
-import MemSche from '../entity/memberSchedule.entity';
+import MemberSchedule from '../entity/memberSchedule.entity';
 
-const MemScheRepository = AppDataSource.getRepository(MemSche).extend({});
+const MemberScheduleRepository = AppDataSource.getRepository(
+  MemberSchedule,
+).extend({});
 
-export default MemScheRepository;
+export default MemberScheduleRepository;

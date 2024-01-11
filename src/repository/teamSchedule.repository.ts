@@ -1,6 +1,8 @@
 import AppDataSource from '../config/dataSource';
-import TeamSche from '../entity/teamSchedule.entity';
+import TeamSchedule from '../entity/teamSchedule.entity';
 
-const TeamScheRepository = AppDataSource.getRepository(TeamSche).extend({});
+const TeamScheduleRepository = AppDataSource.getRepository(TeamSchedule).extend(
+  {},
+);
 
-export default TeamScheRepository;
+export default TeamScheduleRepository;
