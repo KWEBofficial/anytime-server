@@ -8,16 +8,18 @@ import {
   ScheEdit,
   ScheDelete,
   TeamMemScheSearch,
+  isRelated,
 } from './controller';
+import { isAdmin } from '../notice/controller';
 
 const scheRouter = Router();
 
 scheRouter.post('/create', isLoggedIn, ScheAdd);
-scheRouter.post('/create/:teamId', isLoggedIn, TeamScheAdd);
+scheRouter.post('/create/:teamId', isLoggedIn, isAdmin, TeamScheAdd);
 scheRouter.get('/', isLoggedIn, AllScheSearch);
-scheRouter.get('/:scheduleId', isLoggedIn, OneScheSearch);
-scheRouter.patch('/:scheduleId', isLoggedIn, ScheEdit);
-scheRouter.delete('/:scheduleId', isLoggedIn, ScheDelete);
-scheRouter.get('/team/:teamId', isLoggedIn, TeamMemScheSearch);
+scheRouter.get('/:scheduleId', isLoggedIn, isRelated, OneScheSearch);
+scheRouter.patch('/:scheduleId', isLoggedIn, isRelated, isAdmin, ScheEdit);
+scheRouter.delete('/:scheduleId', isLoggedIn, isRelated, isAdmin, ScheDelete);
+scheRouter.get('/team/:teamId', isLoggedIn, isAdmin, TeamMemScheSearch);
 
 export default scheRouter;

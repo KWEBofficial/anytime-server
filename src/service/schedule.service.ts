@@ -11,17 +11,18 @@ import Schedule from '../entity/schedule.entity';
 import MemberSchedule from '../entity/memberSchedule.entity';
 import TeamSchedule from '../entity/teamSchedule.entity';
 
-import ScheRepository from '../repository/schedule.repository';
-import MemScheRepository from '../repository/memberSchedule.repository';
-import TeamScheRepository from '../repository/teamSchedule.repository';
-import MemTeamRepository from '../repository/memberTeam.repository';
+import ScheduleRepository from '../repository/schedule.repository';
+import MemberScheduleRepository from '../repository/memberSchedule.repository';
+import TeamScheduleRepository from '../repository/teamSchedule.repository';
+import MemberTeamRepository from '../repository/memberTeam.repository';
 import MemberRepository from '../repository/member.repository';
 import TeamRepository from '../repository/team.repository';
+import { BadRequestError, InternalServerError } from '../util/customErrors';
 
 export default class ScheService {
   static async ScheAdd(scheAddReq: ScheduleDTO): Promise<Schedule> {
     try {
-      const schedule = await ScheRepository.save({
+      const schedule = await ScheduleRepository.save({
         schedulename: scheAddReq.name,
         startTime: scheAddReq.startTime,
         endTime: scheAddReq.endTime,
@@ -29,16 +30,16 @@ export default class ScheService {
       });
       return schedule;
     } catch (error) {
-      throw new Error('ScheAdd Failure');
+      throw new InternalServerError('일정을 추가하는데 실패하였습니다.');
     }
   }
 
   static async ScheSave(schedule: Schedule): Promise<Schedule> {
     try {
-      const resultsche = await ScheRepository.save(schedule);
+      const resultsche = await ScheduleRepository.save(schedule);
       return resultsche;
     } catch (error) {
-      throw new Error('ScheSave Failure');
+      throw new InternalServerError('일정에 반영하는 것을 실패하였습니다.');
     }
   }
 
@@ -50,10 +51,10 @@ export default class ScheService {
       if (member !== null) {
         return member;
       } else {
-        throw new Error('member:null');
+        throw new BadRequestError('존재하지 않는 멤버입니다.');
       }
     } catch (error) {
-      throw new Error('member find failure');
+      throw new InternalServerError('멤버를 찾는데 실패하였습니다.');
     }
   }
 
@@ -65,16 +66,16 @@ export default class ScheService {
       if (team !== null) {
         return team;
       } else {
-        throw new Error('team:null');
+        throw new BadRequestError('존재하지 않는 모임입니다.');
       }
     } catch (error) {
-      throw new Error('team find failure');
+      throw new InternalServerError('팀을 찾는데 실패하였습니다.');
     }
   }
 
   static async BelongTeamsFind(memberin: Member): Promise<Team[]> {
     try {
-      const relations = await MemTeamRepository.find({
+      const relations = await MemberTeamRepository.find({
         where: { member: { id: memberin.id } },
         relations: ['team'],
       });
@@ -83,16 +84,18 @@ export default class ScheService {
       if (teams !== undefined) {
         return teams;
       } else {
-        throw new Error('belongteam:undefined');
+        throw new InternalServerError(
+          '소속 모임이 비정상적으로 처리되었습니다.',
+        );
       }
     } catch (error) {
-      throw new Error('belongteamFind:Fail');
+      throw new InternalServerError('소속 모임을 찾는데 실패하였습니다.');
     }
   }
 
   static async ScheFindByMem(memberin: Member): Promise<Schedule[]> {
     try {
-      const relations = await MemScheRepository.find({
+      const relations = await MemberScheduleRepository.find({
         where: { member: { id: memberin.id } },
         relations: ['schedule'],
       });
@@ -101,16 +104,18 @@ export default class ScheService {
       if (schedules !== undefined) {
         return schedules;
       } else {
-        throw new Error('schefindbymem:undefined');
+        throw new InternalServerError(
+          '개인 일정이 비정상적으로 처리되었습니다.',
+        );
       }
     } catch (error) {
-      throw new Error('ScheFindByMem Failure');
+      throw new InternalServerError('개인 일정 조회에 실패하였습니다.');
     }
   }
 
   static async ScheFindByTeam(teamin: Team): Promise<Schedule[]> {
     try {
-      const relations = await TeamScheRepository.find({
+      const relations = await TeamScheduleRepository.find({
         where: { team: { id: teamin.id } },
         relations: ['schedule'],
       });
@@ -119,25 +124,27 @@ export default class ScheService {
       if (schedules !== undefined) {
         return schedules;
       } else {
-        throw new Error('schefindby:teamundefined');
+        throw new InternalServerError(
+          '모임 일정이 비정상적으로 처리되었습니다.',
+        );
       }
     } catch (error) {
-      throw new Error('ScheFindByTeam Failure');
+      throw new InternalServerError('모임 일정 조회에 실패하였습니다.');
     }
   }
 
   static async ScheFindById(scheduleId: number): Promise<Schedule> {
     try {
-      const schedule = await ScheRepository.findOne({
+      const schedule = await ScheduleRepository.findOne({
         where: { id: scheduleId },
       });
       if (schedule !== null) {
         return schedule;
       } else {
-        throw new Error('schedule:null');
+        throw new BadRequestError('존재하지 않는 일정입니다.');
       }
     } catch (error) {
-      throw new Error('schedule find failure');
+      throw new InternalServerError('일정 조회에 실패하였습니다.');
     }
   }
 
@@ -146,13 +153,13 @@ export default class ScheService {
     schedulein: Schedule,
   ): Promise<MemberSchedule> {
     try {
-      const memSche = await MemScheRepository.save({
+      const memSche = await MemberScheduleRepository.save({
         member: memberin,
         schedule: schedulein,
       });
       return memSche;
     } catch (error) {
-      throw new Error('Mem-ScheAdd Failure');
+      throw new InternalServerError('사용자 일정 관계 저장에 실패하였습니다.');
     }
   }
 
@@ -161,20 +168,20 @@ export default class ScheService {
     schedulein: Schedule,
   ): Promise<TeamSchedule> {
     try {
-      const teamSche = await TeamScheRepository.save({
+      const teamSche = await TeamScheduleRepository.save({
         team: teamin,
         schedule: schedulein,
       });
       return teamSche;
     } catch (error) {
-      throw new Error('Team-ScheAdd Failure');
+      throw new InternalServerError('모임 일정 관계 저장에 실패하였습니다.');
     }
   }
 
   static async TeamMemFind(teamId: number): Promise<Member[]> {
     try {
       const teamin = await ScheService.TeamFindById(teamId);
-      const relations = await MemTeamRepository.find({
+      const relations = await MemberTeamRepository.find({
         where: { team: { id: teamin.id } },
         relations: ['member'],
       });
@@ -183,10 +190,10 @@ export default class ScheService {
       if (members !== undefined) {
         return members;
       } else {
-        throw new Error('member:undefined');
+        throw new InternalServerError('소속원이 비정상적으로 처리되었습니다.');
       }
     } catch (error) {
-      throw new Error('team-mem failure');
+      throw new InternalServerError('소속원을 조회하는데 실패하였습니다.');
     }
   }
 
@@ -200,7 +207,7 @@ export default class ScheService {
       );
       return ScheduleDTOs;
     } catch (error) {
-      throw new Error('memtoschedto failure');
+      throw new InternalServerError('개인 일정을 불러오는데 실패하였습니다.');
     }
   }
 
@@ -214,7 +221,7 @@ export default class ScheService {
       );
       return ScheduleDTOs;
     } catch (error) {
-      throw new Error('teamtoschedto failure');
+      throw new InternalServerError('모임 일정을 불러오는데 실패하였습니다.');
     }
   }
 
@@ -228,7 +235,9 @@ export default class ScheService {
       };
       return scheduleDTO;
     } catch (error) {
-      throw new Error('schetoscheduledto failure');
+      throw new InternalServerError(
+        '일정을 일정 송신 양식으로 변환하는데 실패하였습니다.',
+      );
     }
   }
 
@@ -240,7 +249,9 @@ export default class ScheService {
       };
       return scheResDTO;
     } catch (error) {
-      throw new Error('schetoscheresdto failure');
+      throw new InternalServerError(
+        '일정을 소속원 일정 양식으로 변환한는데 실패하였습니다.',
+      );
     }
   }
 
@@ -261,27 +272,23 @@ export default class ScheService {
       );
       return ScheResDTOs;
     } catch (error) {
-      throw new Error('memtoscheresdtos failure');
+      throw new InternalServerError(
+        '모임 소속원들의 일정을 불러오는데 실패하였습니다.',
+      );
     }
   }
-  //static async ScheToScheResDTO(schedulein: Schedule): Promise<Schedule>
 
-  /*static async MemSchedulesFind(members: Member[]): Promise<number[]> {
-    const ownSche = await ScheService.;
-  }
-  /*static async AllScheFind(memberId: number): Promise<AllScheSearchResDTO> {
+  static async RelationFind(
+    memberid: number,
+    scheduleid: number,
+  ): Promise<MemberSchedule | null> {
     try {
-      const member = await ScheService.MemFindById(memberId);
-      const team[] = await 
-      const myScheduleIds = await MemScheRepository.find({
-        where: { member: member },
+      const relation = await MemberScheduleRepository.findOne({
+        where: { member: { id: memberid }, schedule: { id: scheduleid } },
       });
-      const TeamScheduleIds = await TeamScheRepository.find({
-        where: {team:},
-      });
-      const 
-      const 
-      return AllScheSearchRes
-    } catch (error) {}
-  }*/
+      return relation;
+    } catch (error) {
+      throw new InternalServerError('관계 조회 실패');
+    }
+  }
 }
