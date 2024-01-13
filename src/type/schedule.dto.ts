@@ -8,6 +8,7 @@ export interface ScheduleDTO {
 export interface TeamScheResDTO {
   teamId: number;
   teamname: string;
+  color: number;
   schedules: ScheduleDTO[];
 }
 

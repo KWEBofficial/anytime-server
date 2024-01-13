@@ -15,11 +15,20 @@ declare module 'express-session' {
 
 import ScheService from '../../service/schedule.service';
 import Team from '../../entity/team.entity';
+import {
+  BadRequestError,
+  ForbiddenError,
+  InternalServerError,
+  UnauthorizedError,
+} from '../../util/customErrors';
 
 export const ScheAdd: RequestHandler = async (req, res, next) => {
   try {
     const scheAddReq: ScheduleDTO = req.body;
     const memberIdCon = req.session.passport?.user;
+    if (scheAddReq.startTime > scheAddReq.endTime) {
+      throw new BadRequestError('시작일이 끝나는 일보다 늦을 수 없습니다.');
+    }
     if (memberIdCon !== undefined) {
       const memberId = memberIdCon;
       const schedule = await ScheService.ScheAdd(scheAddReq);
@@ -28,10 +37,10 @@ export const ScheAdd: RequestHandler = async (req, res, next) => {
       if (memSche != null) {
         return res.status(200).json();
       } else {
-        return res.status(400);
+        throw new InternalServerError('사용자 일정 관계 저장 실패');
       }
     } else {
-      throw new Error('session failure');
+      throw new UnauthorizedError('세션 비정상');
     }
   } catch (error) {
     next(error);
@@ -43,6 +52,9 @@ export const TeamScheAdd: RequestHandler = async (req, res, next) => {
     const publicScheAddReq: ScheduleDTO = req.body;
     const teamId = req.params.teamId as unknown as number;
     const memberIdCon = req.session.passport?.user;
+    if (publicScheAddReq.startTime > publicScheAddReq.endTime) {
+      throw new BadRequestError('시작일이 끝나는 일보다 늦을 수 없습니다.');
+    }
     if (memberIdCon !== undefined) {
       const schedule = await ScheService.ScheAdd(publicScheAddReq);
       const team = await ScheService.TeamFindById(teamId);
@@ -50,10 +62,10 @@ export const TeamScheAdd: RequestHandler = async (req, res, next) => {
       if (teamSche != null) {
         return res.status(200).json();
       } else {
-        return res.status(400);
+        throw new InternalServerError('모임 일정 관계 저장 실패');
       }
     } else {
-      throw new Error('session failure');
+      throw new UnauthorizedError('세션 비정상');
     }
   } catch (error) {
     next(error);
@@ -73,6 +85,7 @@ export const AllScheSearch: RequestHandler = async (req, res, next) => {
           const firstmap: TeamScheResDTO = {
             teamId: t.id,
             teamname: t.teamname,
+            color: t.color,
             schedules: await ScheService.TeamToScheduleDTOs(t),
           };
           return firstmap;
@@ -84,7 +97,7 @@ export const AllScheSearch: RequestHandler = async (req, res, next) => {
       };
       return res.status(200).json(AllScheSearchRes);
     } else {
-      throw new Error('memberId:undefined');
+      throw new UnauthorizedError('세션 비정상');
     }
   } catch (error) {
     next(error);
@@ -100,7 +113,7 @@ export const OneScheSearch: RequestHandler = async (req, res, next) => {
         await ScheService.ScheToScheduleDTO(schedule);
       res.status(200).json(oneScheSearchRes);
     } else {
-      return res.status(400);
+      throw new BadRequestError('일정이 존재하지 않습니다.');
     }
   } catch (error) {
     next(error);
@@ -112,6 +125,9 @@ export const ScheEdit: RequestHandler = async (req, res, next) => {
     const scheEditReq: ScheduleDTO = req.body;
     const scheduleId = req.params.scheduleId as unknown as number;
     const schedule = await ScheService.ScheFindById(scheduleId);
+    if (scheEditReq.startTime > scheEditReq.endTime) {
+      throw new BadRequestError('시작일이 끝나는 일보다 늦을 수 없습니다.');
+    }
     if (schedule !== null) {
       schedule.schedulename = scheEditReq.name;
       schedule.startTime = scheEditReq.startTime;
@@ -121,10 +137,10 @@ export const ScheEdit: RequestHandler = async (req, res, next) => {
       if (result !== null) {
         return res.status(200).json();
       } else {
-        throw new Error('save failure');
+        throw new InternalServerError('일정 정보 반영 실패');
       }
     } else {
-      throw new Error('schedule:null');
+      throw new BadRequestError('일정이 존재하지 않습니다.');
     }
   } catch (error) {
     next(error);
@@ -137,10 +153,14 @@ export const ScheDelete: RequestHandler = async (req, res, next) => {
     const schedule = await ScheService.ScheFindById(scheduleId);
     if (schedule != null) {
       schedule.deletedAt = new Date();
-      await ScheService.ScheSave(schedule);
-      return res.status(200).json();
+      const result = await ScheService.ScheSave(schedule);
+      if (result !== null) {
+        return res.status(200).json();
+      } else {
+        throw new InternalServerError('일정 정보 반영 실패');
+      }
     } else {
-      return res.status(400).json;
+      throw new BadRequestError('일정이 존재하지 않습니다.');
     }
   } catch (error) {
     next(error);
@@ -161,6 +181,29 @@ export const TeamMemScheSearch: RequestHandler = async (req, res, next) => {
       }),
     );
     return res.status(200).json(TeamMemSches);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const isRelated: RequestHandler = async (req, res, next) => {
+  try {
+    const memberId = req.session.passport?.user;
+    const { scheduleId } = req.params;
+    if (memberId) {
+      if (scheduleId) {
+        const ascheduleId = scheduleId as unknown as number;
+        const relation = await ScheService.RelationFind(memberId, ascheduleId);
+        if (relation) {
+          next();
+        } else {
+          throw new ForbiddenError('사용자와 관계가 없는 일정입니다.');
+        }
+      }
+      next();
+    } else {
+      throw new UnauthorizedError('세션 비정상');
+    }
   } catch (error) {
     next(error);
   }
