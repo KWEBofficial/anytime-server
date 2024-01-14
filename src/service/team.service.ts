@@ -78,7 +78,40 @@ export default class TeamService {
         ])
         .where('m.member_id = :id', { id: id })
         .getRawMany();
-    } catch (error) {}
+    } catch (error) {
+      throw new InternalServerError('멤버-팀 정보를 불러오는데 실패했습니다.');
+    }
+  }
+
+  static async getMemberByTeam(id: number) {
+    try {
+      return await MemberTeamRepository.createQueryBuilder('mt')
+        .leftJoin(Member, 'm', 'm.id = mt.member_id')
+        .select([
+          'm.id AS id',
+          'm.membername AS name',
+          'mt.is_admin AS isAdmin',
+        ])
+        .where('mt.team_id = :id', { id: id })
+        .getRawMany();
+    } catch (error) {
+      throw new InternalServerError('팀-멤버 정보를 불러오는데 실패했습니다.');
+    }
+  }
+
+  static async getIsAdmin(
+    memberId: number,
+    teamId: number,
+  ): Promise<boolean | null> {
+    try {
+      const memberTeam = await MemberTeamRepository.findOne({
+        where: { member: { id: memberId }, team: { id: teamId } },
+      });
+      if (memberTeam) return memberTeam.isAdmin;
+      else return null;
+    } catch (error) {
+      throw new InternalServerError('어드민 여부를 불러오는데 실패했습니다.');
+    }
   }
 
   static async updateTeam(
