@@ -4,7 +4,12 @@
 import { RequestHandler } from 'express';
 import NoticeService from '../../service/notice.service';
 import { BadRequestError, ForbiddenError } from '../../util/customErrors';
-import { NoticeResDTO, NoticeUpdateReqDTO } from '../../type/notice.dto';
+import {
+  NoticeAllResDTO,
+  NoticeAllTmResDTO,
+  NoticeResDTO,
+  NoticeUpdateReqDTO,
+} from '../../type/notice.dto';
 
 declare module 'express-session' {
   interface SessionData {
@@ -13,6 +18,33 @@ declare module 'express-session' {
     };
   }
 }
+export const getAllNotices: RequestHandler = async (req, res, next) => {
+  try {
+    const teamId = Number(req.params.teamId);
+    const team = await NoticeService.findTeamById(teamId);
+    if (!team) throw new BadRequestError('해당하는 모임이 없습니다.');
+    const teamname = team.teamname;
+    const notices = await NoticeService.getNoticeByTeamId(teamId);
+    if (!notices) throw new BadRequestError('해당하는 모임이 없습니다.');
+    const noticeList = notices.map((notice) => {
+      return <NoticeAllResDTO>{
+        noticeId: notice.id,
+        content: notice.content,
+        startDate: notice.startDate,
+        endDate: notice.endDate,
+        createdAt: notice.createdAt,
+        isPrior: notice.isPrior,
+      };
+    });
+    const NoticeAllTmResDTO: NoticeAllTmResDTO = {
+      teamname,
+      notices: noticeList,
+    };
+    res.status(200).json(NoticeAllTmResDTO);
+  } catch (error) {
+    next(error);
+  }
+};
 
 export const getNotices: RequestHandler = async (req, res, next) => {
   try {
@@ -20,14 +52,22 @@ export const getNotices: RequestHandler = async (req, res, next) => {
     if (isNaN(teamId)) throw new BadRequestError('teamId가 숫자가 아닙니다.');
     const notices = await NoticeService.getNoticeByTeamId(teamId);
     if (!notices) throw new BadRequestError('해당하는 모임이 없습니다.');
-    const noticeList = notices.map((notice) => {
-      return <NoticeResDTO>{
-        noticeId: notice.id,
-        content: notice.content,
-        createdAt: notice.createdAt,
-        isPrior: notice.isPrior,
-      };
-    });
+    const noticeList = notices
+      .filter(
+        (notice) =>
+          notice.startDate &&
+          notice.endDate &&
+          new Date() > notice.startDate &&
+          new Date() < notice.endDate,
+      )
+      .map((notice) => {
+        return <NoticeResDTO>{
+          noticeId: notice.id,
+          content: notice.content,
+          createdAt: notice.createdAt,
+          isPrior: notice.isPrior,
+        };
+      });
     res.status(200).json(noticeList);
   } catch (error) {
     next(error);
@@ -45,7 +85,7 @@ export const createNotice: RequestHandler = async (req, res, next) => {
       throw new BadRequestError('시작일이 끝나는 일보다 늦을 수 없습니다.');
     NoticeService.createNotice(
       team,
-      NoticeUpdateReqDTO.content,
+      NoticeUpdateReqDTO.content.slice(0, 256),
       NoticeUpdateReqDTO.startDate,
       NoticeUpdateReqDTO.endDate,
       NoticeUpdateReqDTO.isPrior,
