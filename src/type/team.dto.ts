@@ -36,13 +36,28 @@ export interface TeamMemberDTO {
   isAdmin: boolean;
 }
 
+export interface SchedulesDTO {
+  id: number;
+  schedulename: string;
+  startTime: Date;
+  endTime: Date;
+  explanation: string;
+}
+
+export interface NoticesDTO {
+  id: number;
+  content: string;
+  createdAt: Date;
+  isPrior: boolean;
+}
+
 export interface TeamReadResDTO {
   teamname: string;
   color: number;
   explanation: string;
   isPublic: boolean;
   members: TeamMemberDTO[];
-  schedules: ScheduleDTO[];
-  notices: NoticeResDTO[];
-  isAdmin: boolean;
+  schedules: SchedulesDTO[];
+  notices: NoticesDTO[];
+  isAdmin: boolean | null;
 }

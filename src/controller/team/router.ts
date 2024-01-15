@@ -4,7 +4,7 @@ import {
   myTeam,
   searchTeam,
   updateTeam,
-  //showTeam,
+  showTeam,
   deleteTeam,
 } from './controller';
 import {
@@ -16,9 +16,8 @@ import {
   unsubsTeam,
 } from '../memberTeam/controller';
 
-import {} from '../auth/controller';
-
 const teamRouter = Router();
+
 
 teamRouter.patch('/favorite/:teamId', toggleFavoriteTeam);
 teamRouter.patch('/hide/:teamId', toggleHideTeam);
