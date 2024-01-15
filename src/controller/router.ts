@@ -20,7 +20,7 @@ router.use('/notice', noticeRouter);
 router.use('/auth', authRouter);
 router.use('/schedule', scheRouter);
 router.use('/member', memberRouter);
-router.use('/alarm', alarmRouter);
+router.use('/alarm', isLoggedIn, alarmRouter);
 
 export default router;
 //main router
