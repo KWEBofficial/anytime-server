@@ -41,12 +41,24 @@ export default class TeamService {
     try {
       if (keyword == '') {
         return await TeamRepository.find({
+          select: {
+            id: true,
+            teamname: true,
+            color: true,
+            explanation: true,
+          },
           where: {
             isPublic: true,
           },
         });
       } else {
         return await TeamRepository.createQueryBuilder('team')
+          .select([
+            'team.id',
+            'team.teamname',
+            'team.color',
+            'team.explanation',
+          ])
           .where('team.teamname LIKE :keyword', { keyword: `%${keyword}%` })
           .andWhere('team.is_public = true')
           .getMany();
