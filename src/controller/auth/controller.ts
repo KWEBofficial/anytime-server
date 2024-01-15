@@ -40,7 +40,7 @@ export const loginMember: RequestHandler = async (req, res, next) => {
               throw new BadRequestError(options.message);
             } else {
               console.log('로그인 되었습니다.');
-              return res.status(200).json();
+              return res.status(200).json({ userId: user });
             }
           });
         } else {
