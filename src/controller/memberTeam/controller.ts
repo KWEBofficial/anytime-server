@@ -54,20 +54,19 @@ export const inviteMember: RequestHandler = async (req, res, next) => {
     const inviteReqDTO: InviteReqDTO = req.body;
     const userId = Number(req.session.passport?.user);
 
+    const member = await MemberService.findMember(inviteReqDTO.memberId);
+    if (!member) throw new BadRequestError('존재하지 않는 유저입니다');
+
     const invite = await MemberTeamService.inviteMember(
       inviteReqDTO.memberId,
       inviteReqDTO.teamId,
       userId,
     );
+    if (inviteReqDTO.memberId === userId)
+      throw new BadRequestError('본인을 초대할 수 없습니다.');
 
     if (invite === false)
       throw new BadRequestError('초대하고자 하는 그룹에 속해있지 않습니다');
-
-    const member = await MemberService.findMember(inviteReqDTO.memberId);
-    if (!member) throw new BadRequestError('존재하지 않는 유저입니다');
-
-    if (inviteReqDTO.memberId === userId)
-      throw new BadRequestError('본인을 초대할 수 없습니다.');
 
     if (invite === true) throw new BadRequestError('이미 초대된 유저입니다.');
 
