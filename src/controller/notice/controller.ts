@@ -109,7 +109,8 @@ export const isAdmin: RequestHandler = async (req, res, next) => {
       );
       if (!memberTeam)
         throw new BadRequestError('해당하는 모임에 소속되어 있지 않습니다.');
-      if (!memberTeam.isAdmin) throw new ForbiddenError('권한이 없습니다.');
+      if (team.isPublic && !memberTeam.isAdmin)
+        throw new ForbiddenError('권한이 없습니다.');
     } else if (noticeId) {
       if (isNaN(Number(noticeId)))
         throw new BadRequestError('noticeId가 숫자가 아닙니다.');
@@ -134,18 +135,12 @@ export const isAdmin: RequestHandler = async (req, res, next) => {
       if (teamSchedule) {
         const teamId = teamSchedule.team.id;
         const isPublic = teamSchedule.team.isPublic;
-        if (!isPublic) next();
-        else {
-          const memberTeam = await NoticeService.findMemberTeam(
-            memberId,
-            teamId,
-          );
-          if (!memberTeam)
-            throw new BadRequestError(
-              '해당하는 모임에 소속되어 있지 않습니다.',
-            );
-          if (!memberTeam.isAdmin) throw new ForbiddenError('권한이 없습니다.');
-        }
+
+        const memberTeam = await NoticeService.findMemberTeam(memberId, teamId);
+        if (!memberTeam)
+          throw new BadRequestError('해당하는 모임에 소속되어 있지 않습니다.');
+        if (isPublic && !memberTeam.isAdmin)
+          throw new ForbiddenError('권한이 없습니다.');
       }
     }
     next();

@@ -1,13 +1,11 @@
-import { DeleteResult, createQueryBuilder } from 'typeorm';
+import { DeleteResult } from 'typeorm';
 import Notice from '../entity/notice.entity';
 import NoticeRepository from '../repository/notice.repository';
 import TeamRepository from '../repository/team.repository';
 import { BadRequestError, InternalServerError } from '../util/customErrors';
 import Team from '../entity/team.entity';
-import MemberRepository from '../repository/member.repository';
-import Member from '../entity/member.entity';
 import MemberTeam from '../entity/memberTeam.entity';
-import MemberTeamRepository from '../repository/memberTeam.respository';
+import MemberTeamRepository from '../repository/memberTeam.repository';
 import Schedule from '../entity/schedule.entity';
 import ScheduleRepository from '../repository/schedule.repository';
 import TeamScheduleRepository from '../repository/teamSchedule.repository';
