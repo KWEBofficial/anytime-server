@@ -6,6 +6,7 @@ import authRouter from './auth/router';
 import scheRouter from './schedule/router';
 import teamMemberRouter from './memberTeam/router';
 import memberRouter from './member/router';
+import alarmRouter from './alarm/router';
 
 const router = Router();
 
@@ -19,6 +20,7 @@ router.use('/auth', authRouter);
 router.use('/schedule', scheRouter);
 router.use('/member', memberRouter);
 router.use('/team', teamMemberRouter);
+router.use('/alarm', alarmRouter);
 
 export default router;
 //main router
