@@ -5,14 +5,6 @@ import {
   TeamScheResDTO,
   TeamMemScheDTO,
 } from '../../type/schedule.dto';
-declare module 'express-session' {
-  interface SessionData {
-    passport: {
-      user: number;
-    };
-  }
-}
-
 import ScheService from '../../service/schedule.service';
 import Team from '../../entity/team.entity';
 import {
@@ -21,7 +13,16 @@ import {
   InternalServerError,
   UnauthorizedError,
 } from '../../util/customErrors';
+import AlarmService from '../../service/alarm.service';
+import TeamService from '../../service/team.service';
 
+declare module 'express-session' {
+  interface SessionData {
+    passport: {
+      user: number;
+    };
+  }
+}
 export const ScheAdd: RequestHandler = async (req, res, next) => {
   try {
     const scheAddReq: ScheduleDTO = req.body;
@@ -60,6 +61,15 @@ export const TeamScheAdd: RequestHandler = async (req, res, next) => {
       const team = await ScheService.TeamFindById(teamId);
       const teamSche = await ScheService.TeamScheAdd(team, schedule);
       if (teamSche != null) {
+        const memberList = TeamService.getMemberByTeam(teamId);
+        (await memberList).forEach(
+          async (memberInfo) =>
+            await AlarmService.createScheAlarm(
+              memberInfo.id,
+              team,
+              publicScheAddReq.name,
+            ),
+        );
         return res.status(200).json();
       } else {
         throw new InternalServerError('모임 일정 관계 저장 실패');

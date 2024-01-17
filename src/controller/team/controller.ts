@@ -10,16 +10,13 @@ import {
   TeamReadResDTO,
   TeamUpdateReqDTO,
 } from '../../type/team.dto';
-import Team from '../../entity/team.entity';
 import {
   BadRequestError,
   ForbiddenError,
   UnauthorizedError,
 } from '../../util/customErrors';
-import MemberTeamService from '../../service/memberTeam.service';
 import ScheService from '../../service/schedule.service';
 import NoticeService from '../../service/notice.service';
-import { NoticeResDTO } from '../../type/notice.dto';
 
 declare module 'express-session' {
   interface SessionData {

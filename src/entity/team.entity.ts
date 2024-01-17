@@ -25,10 +25,11 @@ export default class Team {
   teamname!: string;
 
   @Column({
-    type: 'int',
+    type: 'varchar',
+    length: 16,
     nullable: false,
   })
-  color!: number;
+  color!: string;
 
   @Column({
     type: 'varchar',

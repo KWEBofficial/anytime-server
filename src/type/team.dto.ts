@@ -1,9 +1,6 @@
-import { NoticeResDTO } from './notice.dto';
-import { ScheduleDTO } from './schedule.dto';
-
 export interface TeamCreateReqDTO {
   teamname: string;
-  color: number;
+  color: string;
   explanation: string;
   isPublic: boolean;
 }
@@ -20,13 +17,13 @@ export interface MyTeamResDTO {
 export interface TeamListResDTO {
   id: number;
   teamname: string;
-  color: number;
+  color: string;
   explanation: string;
 }
 
 export interface TeamUpdateReqDTO {
   teamname: string;
-  color: number;
+  color: string;
   explanation: string;
 }
 
@@ -53,7 +50,7 @@ export interface NoticesDTO {
 
 export interface TeamReadResDTO {
   teamname: string;
-  color: number;
+  color: string;
   explanation: string;
   isPublic: boolean;
   members: TeamMemberDTO[];
