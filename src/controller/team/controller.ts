@@ -147,8 +147,8 @@ export const showTeam: RequestHandler = async (req, res, next) => {
             createdAt: notice.createdAt,
             isPrior: notice.isPrior,
           };
-        })
-        .slice(0, 2);
+        });
+
       // team id로 member 찾기
       const members = (await TeamService.getMemberByTeam(
         teamId,

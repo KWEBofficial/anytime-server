@@ -64,10 +64,10 @@ export const TeamScheAdd: RequestHandler = async (req, res, next) => {
         const memberList = TeamService.getMemberByTeam(teamId);
         (await memberList).forEach(
           async (memberInfo) =>
-            await AlarmService.createScheAlarm(
+            await AlarmService.createAlarm(
+              `${team.teamname}에 ${publicScheAddReq.name} 일정이 추가되었습니다.`,
               memberInfo.id,
-              team,
-              publicScheAddReq.name,
+              teamId,
             ),
         );
         return res.status(200).json();

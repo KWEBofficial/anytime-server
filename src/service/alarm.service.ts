@@ -56,33 +56,15 @@ export default class AlarmService {
     }
   }
 
-  static async createInviteAlarm(
+  static async createAlarm(
+    content: string,
     memberId: number,
-    team: Team,
+    teamId: number,
   ): Promise<InsertResult> {
     try {
-      const content = `${team.teamname} 그룹에 초대되었습니다.`;
       return await AlarmRepository.insert({
         member: { id: memberId },
-        team: { id: team.id },
-        schedule: { id: null } as any,
-        content: content,
-        isRead: false,
-      });
-    } catch (error) {
-      throw new InternalServerError('알람 생성에 실패했습니다.');
-    }
-  }
-  static async createScheAlarm(
-    memberId: number,
-    team: Team,
-    scheName: string,
-  ): Promise<InsertResult> {
-    try {
-      const content = `${team.teamname}에 ${scheName} 일정이 추가되었습니다.`;
-      return await AlarmRepository.insert({
-        member: { id: memberId },
-        team: { id: team.id },
+        team: { id: teamId },
         schedule: { id: null } as any,
         content: content,
         isRead: false,
