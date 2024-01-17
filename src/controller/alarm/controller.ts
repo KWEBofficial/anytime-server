@@ -23,12 +23,14 @@ export const getAlarm: RequestHandler = async (req, res, next) => {
 
 export const deleteAlarm: RequestHandler = async (req, res, next) => {
   try {
+    const memberId = Number(req.session.passport?.user);
     const alarmId = Number(req.params.alarmId);
 
     if (!alarmId || isNaN(alarmId))
       throw new BadRequestError('잘못된 요청입니다.');
 
-    await AlarmService.deleteAlarm(alarmId);
+    if ((await AlarmService.deleteAlarm(alarmId, memberId)) === false)
+      throw new BadRequestError('존재하지 않는 알람입니다.');
 
     res.status(200).json();
   } catch (error) {
@@ -38,12 +40,14 @@ export const deleteAlarm: RequestHandler = async (req, res, next) => {
 
 export const readAlarm: RequestHandler = async (req, res, next) => {
   try {
+    const memberId = Number(req.session.passport?.user);
     const alarmId = Number(req.params.alarmId);
 
     if (!alarmId || isNaN(alarmId))
       throw new BadRequestError('잘못된 요청입니다.');
 
-    await AlarmService.readAlarm(alarmId);
+    if ((await AlarmService.readAlarm(alarmId, memberId)) === false)
+      throw new BadRequestError('존재하지 않는 알람입니다.');
 
     res.status(200).json();
   } catch (error) {

@@ -1,20 +1,17 @@
 import Alarm from '../entity/alarm.entity';
 import AlarmRepository from '../repository/alarm.repository';
-import { BadRequestError, InternalServerError } from '../util/customErrors';
-import { DeleteResult, InsertResult } from 'typeorm';
+import { InternalServerError } from '../util/customErrors';
+import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 
 export default class AlarmService {
   static async getAlarm(memberId: number): Promise<Alarm[]> {
     try {
       console.log(memberId);
       return await AlarmRepository.createQueryBuilder('alarm')
-        .innerJoin('alarm.team', 'team.id')
-        .innerJoin('alarm.schedule', 'schedule.id')
         .select([
           'alarm.id',
-          'team.id.id',
-          'schedule.id.id',
           'alarm.content',
+          'alarm.createdAt',
           'alarm.isRead',
         ])
         .where('alarm.member = :memberId', { memberId })
@@ -24,25 +21,38 @@ export default class AlarmService {
     }
   }
 
-  static async deleteAlarm(alarmId: number): Promise<DeleteResult> {
+  static async deleteAlarm(
+    alarmId: number,
+    memberId: number,
+  ): Promise<DeleteResult | boolean> {
     try {
-      const alarm = await AlarmRepository.findBy({ id: alarmId });
-      return await AlarmRepository.softDelete(alarm[0].id);
+      const alarm = await AlarmRepository.findOne({
+        where: { id: alarmId, member: { id: memberId } },
+      });
+      if (!alarm) return false;
+      return await AlarmRepository.softDelete(alarm.id);
     } catch (error) {
       throw new InternalServerError('알람 정보를 불러오는데 실패했습니다.');
     }
   }
 
-  static async readAlarm(alarmId: number): Promise<Alarm> {
+  static async readAlarm(
+    alarmId: number,
+    memberId: number,
+  ): Promise<UpdateResult | boolean> {
     try {
-      const alarm = await AlarmRepository.findOneByOrFail({ id: alarmId });
-      if (alarm) alarm.isRead = true;
-      return await AlarmRepository.save(alarm);
+      const alarm = await AlarmRepository.findOne({
+        where: { id: alarmId, member: { id: memberId } },
+      });
+      if (!alarm) return false;
+      return await AlarmRepository.update(alarm.id, {
+        isRead: true,
+      });
     } catch (error) {
       throw new InternalServerError('알람 정보를 불러오는데 실패했습니다.');
     }
   }
-  
+
   static async createInviteAlarm(
     memberId: number,
     teamId: number,
@@ -64,7 +74,7 @@ export default class AlarmService {
   // 테스트케이스 복구 (deletedAt = null && isRead = false)
   static async restoreAlarm(alarmId: number): Promise<Alarm[]> {
     try {
-      const reAlarm = await AlarmRepository.restore(alarmId);
+      await AlarmRepository.restore(alarmId);
       const alarm = await AlarmRepository.findBy({ id: alarmId });
       alarm[0].isRead = false;
       await AlarmRepository.save(alarm[0]);
