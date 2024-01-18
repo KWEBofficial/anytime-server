@@ -21,6 +21,7 @@ import {
   InternalServerError,
   UnauthorizedError,
 } from '../../util/customErrors';
+import NoticeService from '../../service/notice.service';
 
 export const ScheAdd: RequestHandler = async (req, res, next) => {
   try {
@@ -85,6 +86,8 @@ export const AllScheSearch: RequestHandler = async (req, res, next) => {
           const firstmap: TeamScheResDTO = {
             teamId: t.id,
             teamname: t.teamname,
+            isHide: (await NoticeService.findMemberTeam(memberId, t.id))!
+              .isHide, // 잘 되는지 확인할 것
             color: t.color,
             schedules: await ScheService.TeamToScheduleDTOs(t),
           };

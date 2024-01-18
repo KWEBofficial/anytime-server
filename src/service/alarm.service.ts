@@ -6,7 +6,6 @@ import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 export default class AlarmService {
   static async getAlarm(memberId: number): Promise<Alarm[]> {
     try {
-      console.log(memberId);
       return await AlarmRepository.createQueryBuilder('alarm')
         .innerJoin('alarm.team', 'team.id')
         .leftJoin('alarm.schedule', 'schedule.id')
