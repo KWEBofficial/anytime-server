@@ -60,6 +60,8 @@ export const getNotices: RequestHandler = async (req, res, next) => {
           new Date() > notice.startDate &&
           new Date() < notice.endDate,
       )
+      .sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt))
+      .sort((a, b) => Number(b.isPrior) - Number(a.isPrior)) // isPrior=0인 것도 보내야 할 수 있음
       .map((notice) => {
         return <NoticeResDTO>{
           noticeId: notice.id,
@@ -67,7 +69,8 @@ export const getNotices: RequestHandler = async (req, res, next) => {
           createdAt: notice.createdAt,
           isPrior: notice.isPrior,
         };
-      });
+      })
+      .slice(0, 2);
     res.status(200).json(noticeList);
   } catch (error) {
     next(error);
