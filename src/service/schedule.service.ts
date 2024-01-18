@@ -281,12 +281,33 @@ export default class ScheService {
   static async RelationFind(
     memberid: number,
     scheduleid: number,
-  ): Promise<MemberSchedule | null> {
+  ): Promise<MemberSchedule | TeamSchedule | null> {
     try {
       const relation = await MemberScheduleRepository.findOne({
         where: { member: { id: memberid }, schedule: { id: scheduleid } },
       });
-      return relation;
+      if (relation !== null) {
+        return relation;
+      } else {
+        const teamScheRelation = await TeamScheduleRepository.findOne({
+          where: { schedule: { id: scheduleid } },
+          relations: ['team'],
+        });
+        if (teamScheRelation != null) {
+          const team = teamScheRelation.team;
+          const memTeamRelation = await MemberTeamRepository.findOne({
+            where: { team: { id: team.id } },
+            relations: ['member'],
+          });
+          if (memTeamRelation != null) {
+            return teamScheRelation;
+          } else {
+            return null;
+          }
+        } else {
+          return null;
+        }
+      }
     } catch (error) {
       throw new InternalServerError('관계 조회 실패');
     }
