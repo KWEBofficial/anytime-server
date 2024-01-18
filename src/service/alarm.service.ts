@@ -8,13 +8,10 @@ export default class AlarmService {
     try {
       console.log(memberId);
       return await AlarmRepository.createQueryBuilder('alarm')
-        .innerJoin('alarm.team', 'team.id')
-        .leftJoin('alarm.schedule', 'schedule.id')
         .select([
           'alarm.id',
-          'team.id.id',
-          'schedule.id.id',
           'alarm.content',
+          'alarm.createdAt',
           'alarm.isRead',
         ])
         .where('alarm.member = :memberId', { memberId })
