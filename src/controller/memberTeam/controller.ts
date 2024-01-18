@@ -4,6 +4,7 @@ import MemberService from '../../service/member.service';
 import { BadRequestError, ForbiddenError } from '../../util/customErrors';
 import { InviteReqDTO, AdminReqDTO } from '../../type/memberTeam.dto';
 import AlarmService from '../../service/alarm.service';
+import TeamService from '../../service/team.service';
 
 declare module 'express-session' {
   interface SessionData {
@@ -69,11 +70,13 @@ export const inviteMember: RequestHandler = async (req, res, next) => {
       throw new BadRequestError('초대하고자 하는 그룹에 속해있지 않습니다');
 
     if (invite === true) throw new BadRequestError('이미 초대된 유저입니다.');
-
-    await AlarmService.createInviteAlarm(
-      inviteReqDTO.memberId,
-      inviteReqDTO.teamId,
-    );
+    const team = await TeamService.getTeamById(inviteReqDTO.teamId);
+    if (team)
+      await AlarmService.createAlarm(
+        `${team.teamname} 그룹에 초대되었습니다.`,
+        inviteReqDTO.memberId,
+        inviteReqDTO.teamId,
+      );
     return res.status(200).json();
   } catch (error) {
     next(error);
@@ -96,7 +99,13 @@ export const toggleAdmin: RequestHandler = async (req, res, next) => {
       throw new BadRequestError(
         '존재하지 않는 유저이거나 그룹 소속이 아닙니다.',
       );
-
+    const team = await TeamService.getTeamById(adminReqDTO.teamId);
+    if (team)
+      await AlarmService.createAlarm(
+        `${team.teamname}의 관리자가 되었습니다.`,
+        adminReqDTO.memberId,
+        adminReqDTO.teamId,
+      );
     return res.status(200).json();
   } catch (error) {
     next(error);

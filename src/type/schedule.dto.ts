@@ -10,7 +10,7 @@ export interface TeamScheResDTO {
   teamId: number;
   teamname: string;
   isHide: boolean;
-  color: number;
+  color: string;
   schedules: ScheduleDTO[];
 }
 

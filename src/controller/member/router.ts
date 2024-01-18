@@ -1,9 +1,10 @@
 import { Router } from 'express';
-import { searchMember } from './controller';
+import { getMemberById, searchMember } from './controller';
 import { isLoggedIn } from '../auth/controller';
 
 const memberRouter = Router();
 
+memberRouter.get('/', isLoggedIn, getMemberById);
 memberRouter.get('/search', isLoggedIn, searchMember);
 
 export default memberRouter;

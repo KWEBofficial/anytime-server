@@ -21,7 +21,7 @@ export const searchMember: RequestHandler = async (req, res, next) => {
   }
 };
 
-export const getUserById: RequestHandler = async (req, res, next) => {
+export const getMemberById: RequestHandler = async (req, res, next) => {
   try {
     const id = Number(req.params.id);
 

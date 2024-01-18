@@ -10,16 +10,13 @@ import {
   TeamReadResDTO,
   TeamUpdateReqDTO,
 } from '../../type/team.dto';
-import Team from '../../entity/team.entity';
 import {
   BadRequestError,
   ForbiddenError,
   UnauthorizedError,
 } from '../../util/customErrors';
-import MemberTeamService from '../../service/memberTeam.service';
 import ScheService from '../../service/schedule.service';
 import NoticeService from '../../service/notice.service';
-import { NoticeResDTO } from '../../type/notice.dto';
 
 declare module 'express-session' {
   interface SessionData {
@@ -133,14 +130,25 @@ export const showTeam: RequestHandler = async (req, res, next) => {
       // team id로 notice 찾기
       const noticeList = await NoticeService.getNoticeByTeamId(teamId);
       if (!noticeList) throw new BadRequestError('해당하는 모임이 없습니다.');
-      const notices = noticeList.map((notice) => {
-        return <NoticesDTO>{
-          id: notice.id,
-          content: notice.content,
-          createdAt: notice.createdAt,
-          isPrior: notice.isPrior,
-        };
-      });
+      const notices = noticeList
+        .filter(
+          (notice) =>
+            notice.startDate &&
+            notice.endDate &&
+            new Date() > notice.startDate &&
+            new Date() < notice.endDate,
+        )
+        .sort((a, b) => Number(b.updatedAt) - Number(a.updatedAt))
+        .sort((a, b) => Number(b.isPrior) - Number(a.isPrior))
+        .map((notice) => {
+          return <NoticesDTO>{
+            id: notice.id,
+            content: notice.content,
+            createdAt: notice.createdAt,
+            isPrior: notice.isPrior,
+          };
+        });
+
       // team id로 member 찾기
       const members = (await TeamService.getMemberByTeam(
         teamId,
