@@ -1,5 +1,4 @@
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
-import MemberTeam from '../entity/team.entity';
 import MemberTeamRepository from '../repository/memberTeam.repository';
 import TeamRepository from '../repository/team.repository';
 import { InternalServerError } from '../util/customErrors';

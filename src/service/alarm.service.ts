@@ -1,4 +1,5 @@
 import Alarm from '../entity/alarm.entity';
+import Team from '../entity/team.entity';
 import AlarmRepository from '../repository/alarm.repository';
 import { InternalServerError } from '../util/customErrors';
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
@@ -6,7 +7,6 @@ import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
 export default class AlarmService {
   static async getAlarm(memberId: number): Promise<Alarm[]> {
     try {
-      console.log(memberId);
       return await AlarmRepository.createQueryBuilder('alarm')
         .select([
           'alarm.id',
@@ -53,12 +53,12 @@ export default class AlarmService {
     }
   }
 
-  static async createInviteAlarm(
+  static async createAlarm(
+    content: string,
     memberId: number,
     teamId: number,
   ): Promise<InsertResult> {
     try {
-      const content = `${teamId} 그룹에 초대되었습니다.`;
       return await AlarmRepository.insert({
         member: { id: memberId },
         team: { id: teamId },
