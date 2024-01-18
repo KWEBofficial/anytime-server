@@ -23,7 +23,7 @@ export const searchMember: RequestHandler = async (req, res, next) => {
 
 export const getMemberById: RequestHandler = async (req, res, next) => {
   try {
-    const id = Number(req.params.id);
+    const id = Number(req.params.memberId);
 
     const member = await MemberService.findMember(id);
     if (!member) throw new BadRequestError('해당하는 유저가 없습니다.');
