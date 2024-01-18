@@ -5,6 +5,6 @@ import { isLoggedIn } from '../auth/controller';
 const memberRouter = Router();
 
 memberRouter.get('/:memberId', isLoggedIn, getMemberById);
-memberRouter.get('/search', isLoggedIn, searchMember);
+memberRouter.get('/search/:email', isLoggedIn, searchMember);
 
 export default memberRouter;
