@@ -124,7 +124,7 @@ export const OneScheSearch: RequestHandler = async (req, res, next) => {
     if (schedule != null) {
       const oneScheSearchRes: ScheduleDTO =
         await ScheService.ScheToScheduleDTO(schedule);
-      res.status(200).json(oneScheSearchRes);
+      return res.status(200).json(oneScheSearchRes);
     } else {
       throw new BadRequestError('일정이 존재하지 않습니다.');
     }
@@ -236,8 +236,9 @@ export const isRelated: RequestHandler = async (req, res, next) => {
         } else {
           throw new ForbiddenError('사용자와 관계가 없는 일정입니다.');
         }
+      } else {
+        throw new BadRequestError('일정 입력 비정상');
       }
-      next();
     } else {
       throw new UnauthorizedError('세션 비정상');
     }
