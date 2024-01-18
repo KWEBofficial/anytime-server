@@ -15,6 +15,7 @@ import {
 } from '../../util/customErrors';
 import AlarmService from '../../service/alarm.service';
 import TeamService from '../../service/team.service';
+import NoticeService from '../../service/notice.service';
 
 declare module 'express-session' {
   interface SessionData {
@@ -145,6 +146,18 @@ export const ScheEdit: RequestHandler = async (req, res, next) => {
       schedule.explanation = scheEditReq.explanation;
       const result = await ScheService.ScheSave(schedule);
       if (result !== null) {
+        const teamSchedule = await NoticeService.findTeamScheByScheId(
+          Number(scheduleId),
+        );
+        if (teamSchedule) {
+          const team = await TeamService.getTeamById(teamSchedule.team.id);
+          if (team)
+            await AlarmService.createAlarm(
+              `${team.teamname}의 ${schedule.schedulename} 일정이 수정되었습니다.`,
+              Number(req.session.passport?.user),
+              team.id,
+            );
+        }
         return res.status(200).json();
       } else {
         throw new InternalServerError('일정 정보 반영 실패');
@@ -165,6 +178,18 @@ export const ScheDelete: RequestHandler = async (req, res, next) => {
       schedule.deletedAt = new Date();
       const result = await ScheService.ScheSave(schedule);
       if (result !== null) {
+        const teamSchedule = await NoticeService.findTeamScheByScheId(
+          Number(scheduleId),
+        );
+        if (teamSchedule) {
+          const team = await TeamService.getTeamById(teamSchedule.team.id);
+          if (team)
+            await AlarmService.createAlarm(
+              `${team.teamname}의 ${schedule.schedulename} 일정이 삭제되었습니다.`,
+              Number(req.session.passport?.user),
+              team.id,
+            );
+        }
         return res.status(200).json();
       } else {
         throw new InternalServerError('일정 정보 반영 실패');
