@@ -20,3 +20,18 @@ export const searchMember: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const getMemberById: RequestHandler = async (req, res, next) => {
+  try {
+    const id = Number(req.params.memberId);
+
+    const member = await MemberService.findMember(id);
+    if (!member) throw new BadRequestError('해당하는 유저가 없습니다.');
+
+    res
+      .status(200)
+      .json({ email: member.email, membername: member.membername });
+  } catch (error) {
+    next(error);
+  }
+};

@@ -227,6 +227,7 @@ export default class ScheService {
   static async ScheToScheduleDTO(schedulein: Schedule): Promise<ScheduleDTO> {
     try {
       const scheduleDTO: ScheduleDTO = {
+        scheId: schedulein.id,
         name: schedulein.schedulename,
         startTime: schedulein.startTime,
         endTime: schedulein.endTime,

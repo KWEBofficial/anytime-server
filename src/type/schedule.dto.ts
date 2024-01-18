@@ -1,4 +1,5 @@
 export interface ScheduleDTO {
+  scheId: number;
   name: string;
   startTime: Date;
   endTime: Date;
@@ -8,6 +9,7 @@ export interface ScheduleDTO {
 export interface TeamScheResDTO {
   teamId: number;
   teamname: string;
+  isHide: boolean;
   color: string;
   schedules: ScheduleDTO[];
 }
