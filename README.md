@@ -1,11 +1,3 @@
-# Express-TS-TypeORM Server Boilerplate
-
-This is a boilerplate for creating a server with express, typescript and typeorm. It is configured to work with mysql/mariadb. I have also added eslint and prettier settings for code formatting. You can use this boilerplate to create a server for your project.
-
-I have created a user entity and 3 API endpoints about user entity. These 3 APIs have no functional purpose. The purpose of these APIs is only to show how to create an API and how to use typeorm, express and typescript together.
-
-Additionally, I have added a middleware to handle errors and custom errors in `src/util` directory. You can use this middleware to handle errors in your project. You can also remove this middleware if you want.
-
 # Project Setup
 
 ## Database
@@ -28,23 +20,36 @@ DB_PASSWORD=pwd # password of the database
 DB_NAME=example # name of the database, which you created in the previous step
 ```
 
-If you are in production mode, create a `.env.prod` file in the root directory of the project and add the above configuration variables with the appropriate values.
+# 언제든지
 
-## Execution
+이 프로젝트는 개인의 일정을 통합해 모임의 일정을 쉽게 정할 수 있게 도와주는 웹 서비스입니다. 각자 개인의 일정을 '개인 일정'페이지에서 등록하고 '사적 모임'을 생성하여 친구를 초대한 뒤 각자의 일정을 비교해 **최적의** 모임 일정을 정해보세요!
 
-Execute the following commands in the root directory of the project to run the server according to the mode you want.
+## 실행방법
 
-### Development Mode
+- database
+
+생성기본 데이터베이스 관리 시스템(DBMS)은 MySQL/MariaDB입니다. MySQL 또는 MariaDB를 설치하고 원하는 이름의 데이터베이스를 생성하세요. 다른 DBMS를 사용하려면 src/config 디렉토리에 있는 dataSource.ts 파일을 변경할 수 있습니다.
+
+- .env.dev 파일 생성
+
+```
+CLIENT_URL=http://localhost:4000
+
+PORT=3000 # port on which the server will listen
+
+DB_HOST=localhost # host(ip) of the database
+DB_PORT=3306 # port of the database
+DB_USER=root # username of the database
+DB_PASSWORD=pwd # password of the database
+DB_NAME=example # name of the database, which you created in the previous step
+```
+
+를 작성하시면 됩니다.
+그 후
 
 ```bash
 npm install
 npm run dev
 ```
 
-### Production Mode
-
-```bash
-npm install
-npm run build
-npm run prod
-```
+를 하시면 http://localhost:3000에서 실행됩니다.
