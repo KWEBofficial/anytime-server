@@ -1,10 +1,4 @@
-import {
-  ScheResDTO,
-  //AllScheSearchResDTO,
-  ScheduleDTO,
-  //TeamMemScheDTO,
-} from '../type/schedule.dto';
-//import { InternalServerError } from '../util/customErrors';
+import { ScheResDTO, ScheduleDTO } from '../type/schedule.dto';
 import Member from '../entity/member.entity';
 import Team from '../entity/team.entity';
 import Schedule from '../entity/schedule.entity';

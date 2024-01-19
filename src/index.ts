@@ -26,7 +26,6 @@ app.use(
     name: 'mysession',
     secret: process.env.SESSION_SECRET as string,
     resave: true,
-    //saveUninitialize: true,
   }),
 );
 

@@ -1,5 +1,4 @@
 import Alarm from '../entity/alarm.entity';
-import Team from '../entity/team.entity';
 import AlarmRepository from '../repository/alarm.repository';
 import { InternalServerError } from '../util/customErrors';
 import { DeleteResult, InsertResult, UpdateResult } from 'typeorm';
