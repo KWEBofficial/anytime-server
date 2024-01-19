@@ -62,7 +62,19 @@ export default class MemberTeamService {
         where: { member: { id: userId }, team: { id: teamId } },
       });
       if (!userTeam) return false;
+      const team = await TeamRepository.find({ where: { id: teamId } });
+      console.log(`isPublic: ${team[0].isPublic}`);
+      console.log(Boolean(team[0].isPublic) === false);
 
+      if (Boolean(team[0].isPublic) === false) {
+        return await MemberTeamRepository.insert({
+          member: { id: memberId },
+          team: { id: teamId },
+          isAdmin: true,
+          isFavor: false,
+          isHide: false,
+        });
+      }
       return await MemberTeamRepository.insert({
         member: { id: memberId },
         team: { id: teamId },
