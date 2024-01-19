@@ -1,6 +1,3 @@
-// 예시 controller입니다. 필요에 따라 수정하거나 삭제하셔도 됩니다. json으로 백과 프론트가 소통
-//controller -> service -> repos
-
 import { RequestHandler } from 'express';
 import NoticeService from '../../service/notice.service';
 import { BadRequestError, ForbiddenError } from '../../util/customErrors';

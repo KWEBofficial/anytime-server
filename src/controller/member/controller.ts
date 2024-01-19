@@ -5,9 +5,7 @@ import { BadRequestError } from '../../util/customErrors';
 
 export const searchMember: RequestHandler = async (req, res, next) => {
   try {
-    //const email = String(req.query.email);
     const email = String(req.params.email);
-    //console.log(name, email);
     const member = await MemberService.getMemberByEmail(email);
     if (!member) {
       throw new BadRequestError('결과가 없습니다.');
